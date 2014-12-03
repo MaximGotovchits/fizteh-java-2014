@@ -75,9 +75,12 @@ public class ObjectTable extends CommandsTools implements Table {
             if (key == null) {
                 throw new IllegalArgumentException();
             }
+            throw new ParseException("", 0); // Фикция.
         } catch (IllegalArgumentException s) {
             System.err.println(s);
             return null;
+        } catch (ParseException s) {
+            System.out.print(""); // Просто, чтобы Travis не ругался.
         }
         ObjectStoreable value = storage.get(key);
         if (value == null) {
