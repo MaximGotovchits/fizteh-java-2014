@@ -68,19 +68,16 @@ public class ObjectTable extends CommandsTools implements Table {
         return nameToReturn;
     }
     @Override
-    public Storeable get(String key) throws ParseException, IllegalArgumentException { // В документации в Index
+    public Storeable get(String key) throws IllegalArgumentException { // В документации в Index
         // не сказано, когда кидать ParseException, однако согласно интерфейсу тут все-таки написано
         // throws ParseException, но на самом деле это исключение тут не бросатется.
         try {
             if (key == null) {
                 throw new IllegalArgumentException();
             }
-            throw new ParseException("", 0); // Фикция.
         } catch (IllegalArgumentException s) {
             System.err.println(s);
             return null;
-        } catch (ParseException s) {
-            System.out.print(""); // Чтобы Travis не ругался.
         }
         ObjectStoreable value = storage.get(key);
         if (value == null) {
