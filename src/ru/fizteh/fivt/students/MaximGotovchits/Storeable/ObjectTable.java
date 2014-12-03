@@ -80,7 +80,7 @@ public class ObjectTable extends CommandsTools implements Table {
             System.err.println(s);
             return null;
         } catch (ParseException s) {
-            System.out.print(""); // Просто, чтобы Travis не ругался.
+            System.out.print(""); // Чтобы Travis не ругался.
         }
         ObjectStoreable value = storage.get(key);
         if (value == null) {
