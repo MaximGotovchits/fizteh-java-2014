@@ -3,8 +3,6 @@ package ru.fizteh.fivt.students.MaximGotovchits.Storeable.Test;
 import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import junit.framework.*;
 import org.junit.*;
 import org.junit.Test;
 import ru.fizteh.fivt.students.MaximGotovchits.Storeable.*;
@@ -128,6 +126,6 @@ public class ObjectTableTest {
     public void cleanUp() {
         new ObjectTableProvider().removeTable(name);
     }
-
+    
 }
 

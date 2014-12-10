@@ -225,12 +225,12 @@ public class ObjectTableProvider extends CommandsTools implements TableProvider 
             recordsAmount = 0;
             for (Integer i = 0; i < dirNum; ++i) {
                 currentFile = rootDirectory + File.separator + sub.getName() + File.separator
-                        + i + fileExt;
+                + i + dirExt;
                 File file1 = new File(currentFile);
                 if (file1.exists()) {
                     for (Integer j = 0; j < fileNum; ++j) {
                         currentFile = rootDirectory + File.separator + sub.getName() + File.separator
-                                + i + dirExt + File.separator + j + fileExt;
+                        + i + dirExt + File.separator + j + fileExt;
                         file1 = new File(currentFile);
                         try {
                             if (file1.exists()) {
@@ -247,16 +247,18 @@ public class ObjectTableProvider extends CommandsTools implements TableProvider 
                 }
             }
             currentFile = new File(new File(new File(currentFile).getParent()).getParent()).getName();
-            list.add(sub.getName());
-            if (sub.getName().equals(usingTable)) {
-                System.out.println(sub.getName() + " " + (recordsAmount + storage.size()));
-            } else {
-                System.out.println(sub.getName() + " " + recordsAmount);
+            if (!sub.isHidden() && sub.isDirectory()) {
+                list.add(sub.getName());
+                if (sub.getName().equals(usingTable)) {
+                    System.out.println(sub.getName() + " " + (recordsAmount + storage.size()));
+                } else {
+                    System.out.println(sub.getName() + " " + recordsAmount);
+                }
             }
         }
         return list;
     }
-
+    
     void recRem(String myFile) {
         File file = new File(myFile);
         if (!file.exists()) {
@@ -269,7 +271,7 @@ public class ObjectTableProvider extends CommandsTools implements TableProvider 
         }
         file.delete();
     }
-
+    
     public Object checkException(String name) throws IllegalArgumentException {
         try {
             if (name == null || name.length() > longestName) {
@@ -299,7 +301,7 @@ public class ObjectTableProvider extends CommandsTools implements TableProvider 
         tempStoreable.subValueList.add(writingIndex, "\"" + toAdd + "\"");
         return readingIndex;
     }
-
+    
     private int parseBoolean(ObjectTable table, String[] toBeParsed,
                              int readingIndex, int writingIndex, ObjectStoreable tempStoreable) {
         if (toBeParsed[readingIndex].equals("t")) {
@@ -408,7 +410,7 @@ public class ObjectTableProvider extends CommandsTools implements TableProvider 
             return lastIndex;
         }
     }
-
+    
     private boolean isNumber(String str) {
         try {
             Integer.parseInt(str);
@@ -489,7 +491,7 @@ public class ObjectTableProvider extends CommandsTools implements TableProvider 
                     if (valueList[ind].equals("t") || valueList[ind].equals("f")) {
                         if (valueList[ind].equals("t") && ind + 4 < valueList.length) {
                             if (!valueList[ind + 1].equals("r") || !valueList[ind + 2].equals("u")
-                                    || !valueList[ind + 3].equals("e")) {
+                                || !valueList[ind + 3].equals("e")) {
                                 return false;
                             }
                             ind += 4;
@@ -506,7 +508,7 @@ public class ObjectTableProvider extends CommandsTools implements TableProvider 
                         } else {
                             if (valueList[ind].equals("f") && ind + 5 < valueList.length) {
                                 if (!valueList[ind + 1].equals("a") || !valueList[ind + 2].equals("l")
-                                        || !valueList[ind + 3].equals("s") || !valueList[ind + 4].equals("e")) {
+                                    || !valueList[ind + 3].equals("s") || !valueList[ind + 4].equals("e")) {
                                     return false;
                                 }
                                 ind += 5;

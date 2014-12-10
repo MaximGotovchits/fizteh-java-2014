@@ -14,4 +14,3 @@ public class Exit extends CommandsTools {
     }
 }
 
-

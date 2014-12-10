@@ -16,8 +16,13 @@ public class ObjectTable extends CommandsTools implements Table {
     public String tableName;
     public List<Class<?>> typeKeeper = new LinkedList<Class<?>>();
     public ObjectTable() {
-        tableName = usingTable;
-        typeKeeper = currentTableObject.typeKeeper;
+        if (usingTable != null && typeKeeper != null) {
+            tableName = usingTable;
+            typeKeeper = currentTableObject.typeKeeper;
+        } else {
+            tableName = "";
+            typeKeeper = new LinkedList<Class<?>>();
+        }
     }
     public ObjectTable(Table table) {
         ObjectTable temp = (ObjectTable) table;
@@ -31,13 +36,17 @@ public class ObjectTable extends CommandsTools implements Table {
             if (!new File(name + File.separator + signatureFileName).isAbsolute()) {
                 name = dataBaseName + File.separator + name;
             }
-            content = readFile(name + File.separator + signatureFileName, Charset.defaultCharset());
-            content.replaceAll("\\s+", " ");
-            String[] types = content.split(" ");
-            int ind = 0;
-            for (String type : types) {
-                typeKeeper.add(ind, getType(type));
-                ++ind;
+            if (new File(name).isDirectory()) {
+                content = readFile(name + File.separator + signatureFileName, Charset.defaultCharset());
+                content.replaceAll("\\s+", " ");
+                String[] types = content.split(" ");
+                int ind = 0;
+                for (String type : types) {
+                    this.typeKeeper.add(ind, getType(type));
+                    ++ind;
+                }
+            } else {
+                System.err.println(new File(name).getName() + " is not a directory");
             }
         } catch (IOException s) {
             System.err.println(s);
@@ -217,7 +226,7 @@ public class ObjectTable extends CommandsTools implements Table {
     static String readFile(String path, Charset encoding) throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         String temp = new String(encoded, encoding);
-        return temp.substring(0, temp.length() - 2);
+        return temp.substring(0, temp.length() - 1); // Можно было поставить -2. Это зависит от настроек IDE.
     }
     private Class<?> getType(String typeName) {
         if (typeName.equals("int")) {

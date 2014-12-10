@@ -11,7 +11,11 @@ public class ObjectStoreable extends CommandsTools implements Storeable {
     public List<Object> subValueList = new LinkedList<Object>();
     public String serialisedValue = new String();
     public List<Class<?>> typeKeeper = new LinkedList<Class<?>>();
-    public ObjectStoreable() {}
+    public ObjectStoreable() {
+        serialisedValue = "";
+        subValueList = new LinkedList<Object>();
+        typeKeeper = new LinkedList<Class<?>>();
+    }
     public ObjectStoreable(List<?> values) {
         int ind = 0;
         serialisedValue = "[";
@@ -48,8 +52,8 @@ public class ObjectStoreable extends CommandsTools implements Storeable {
         // но я не знаю как, особенно если учесть, что он возваращает Objects, а не Object.
         ObjectStoreable storeableObj = (ObjectStoreable) obj;
         if (this.serialisedValue.equals(storeableObj.serialisedValue)
-                && this.typeKeeper.equals(storeableObj.typeKeeper)
-                && this.subValueList.equals(storeableObj.subValueList)) {
+            && this.typeKeeper.equals(storeableObj.typeKeeper)
+            && this.subValueList.equals(storeableObj.subValueList)) {
             return true;
         }
         return false;

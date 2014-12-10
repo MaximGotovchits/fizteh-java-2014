@@ -1,15 +1,11 @@
 package ru.fizteh.fivt.students.MaximGotovchits.Storeable;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
-
 public class Use extends CommandsTools {
     public void useFunction(String tableName, String oldTableName) throws Exception {
         usingTable = tableName;
         if (!tableName.equals(oldTableName)) {
             String outputName = tableName;
-            String tablePath = dataBaseName + "/" + tableName;
+            String tablePath = dataBaseName + File.separator + tableName;
             File file = new File(tablePath);
             if (file.exists()) {
                 if (tableIsChosen) {
@@ -20,7 +16,7 @@ public class Use extends CommandsTools {
                 for (Integer i = 0; i < dirNum; ++i) {
                     for (Integer j = 0; j < fileNum; ++j) {
                         tablePath = dataBaseName + File.separator + tableName + File.separator
-                                + i + dirExt + File.separator + j + fileExt;
+                        + i + dirExt + File.separator + j + fileExt;
                         if (new File(tablePath).exists()) {
                             fillStorage(tablePath, file);
                             PrintWriter writer = new PrintWriter(new File(tablePath));
@@ -56,7 +52,7 @@ public class Use extends CommandsTools {
             value = new String(data, counter + 2,  data.length - counter - 3, StandardCharsets.UTF_8);
             String tableName = new File(new File(datName).getParent()).getParent();
             ObjectStoreable valForMap = (ObjectStoreable)
-                    new ObjectTableProvider().deserialize(new ObjectTable(tableName), value);
+            new ObjectTableProvider().deserialize(new ObjectTable(tableName), value);
             storage.put(keyForMap, valForMap);
             commitStorage.put(keyForMap, valForMap);
             counter = counter + offset + 1;

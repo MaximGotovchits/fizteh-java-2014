@@ -13,9 +13,9 @@ public class MakeDirs extends CommandsTools {
                 System.exit(1);
             } else {
                 for (File sub : file.listFiles()) {
-                    if (!sub.isDirectory()) {
+                    if (!sub.isDirectory() && !sub.isHidden()) {
                         System.err.println(dataBaseName + File.separator
-                                + sub.getName() + " is not a directory");
+                                           + sub.getName() + " is not a directory");
                     }
                 }
             }

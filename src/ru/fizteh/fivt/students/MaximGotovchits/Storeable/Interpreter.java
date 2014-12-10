@@ -13,13 +13,11 @@ public class Interpreter {
     ObjectTable currentTable;
     String dataBaseName = System.getProperty("fizteh.db.dir");
     static Map<String, String> storage = new HashMap<String, String>();
-
     void getInputData() throws Exception {
         System.out.print(invitationSymbol);
         String cmd = sc.nextLine();
         parseInputData(cmd, false);
     }
-
     void parseInputData(String cmd, boolean fromCmd) throws Exception {
         String[] cmdBuffer = new String[1024];
         if (fromCmd) {
@@ -34,7 +32,6 @@ public class Interpreter {
             } else {
                 cmdBuffer = cmd.split(" ");
                 if (cmdBuffer[0].equals("") && cmdBuffer.length > 0) {
-                    cmd = "";
                     for (int ind = 1; ind < cmdBuffer.length; ++ind) {
                         cmd = cmd + cmdBuffer[ind] + " ";
                     }
@@ -49,25 +46,25 @@ public class Interpreter {
         while (ind < cmdBuffer.length) {
             isCommand = false;
             if (fromCmd) {
-                ifContinue(ind, cmdBuffer, fromCmd);
+                ifContinue(ind, cmdBuffer, fromCmd, false);
             }
             if (cmdBuffer[ind].equals("put")) {
                 isCommand = true;
                 if (tableIsChosen) {
                     ++ind;
-                    ifContinue(ind, cmdBuffer, fromCmd);
+                    ifContinue(ind, cmdBuffer, fromCmd, false);
                     String key = cmdBuffer[ind];
                     ++ind;
-                    ifContinue(ind, cmdBuffer, fromCmd);
+                    ifContinue(ind, cmdBuffer, fromCmd, false);
                     if (!cmdBuffer[ind].substring(0, 1).equals("[")) {
                         isCommand = false;
                         continue;
                     }
                     int startInd = ind;
                     while (!cmdBuffer[ind].substring(cmdBuffer[ind].length() - 1,
-                            cmdBuffer[ind].length()).equals("]")) {
+                                                     cmdBuffer[ind].length()).equals("]")) {
                         ++ind;
-                        ifContinue(ind, cmdBuffer, fromCmd);
+                        ifContinue(ind, cmdBuffer, fromCmd, false);
                     }
                     int finishInd = ind;
                     String value = new String();
@@ -80,7 +77,7 @@ public class Interpreter {
                 } else {
                     System.out.println("no table");
                 }
-                ifContinue(ind + 1, cmdBuffer, fromCmd);
+                ifContinue(ind + 1, cmdBuffer, fromCmd, false);
             }
             if (cmdBuffer[ind].equals("get")) {
                 isCommand = true;
@@ -94,7 +91,7 @@ public class Interpreter {
                 } else {
                     System.out.println("no table");
                 }
-                ifContinue(ind + 1, cmdBuffer, fromCmd);
+                ifContinue(ind + 1, cmdBuffer, fromCmd, false);
             }
             if (cmdBuffer[ind].equals("remove") && ind + 1 < cmdBuffer.length) {
                 isCommand = true;
@@ -104,7 +101,7 @@ public class Interpreter {
                 } else {
                     System.out.println("no table");
                 }
-                ifContinue(ind + 1, cmdBuffer, fromCmd);
+                ifContinue(ind + 1, cmdBuffer, fromCmd, false);
             }
             if (cmdBuffer[ind].equals("list")) {
                 isCommand = true;
@@ -113,7 +110,7 @@ public class Interpreter {
                 } else {
                     System.out.println("no table");
                 }
-                ifContinue(ind + 1, cmdBuffer, fromCmd);
+                ifContinue(ind + 1, cmdBuffer, fromCmd, false);
             }
             if (cmdBuffer[ind].equals("exit")) {
                 isCommand = true;
@@ -123,7 +120,7 @@ public class Interpreter {
                             new FillTable().fillTableFunction(tableName);
                         } else {
                             ++ind;
-                            ifContinue(ind, cmdBuffer, fromCmd);
+                            ifContinue(ind, cmdBuffer, fromCmd, false);
                             continue;
                         }
                     } else {
@@ -132,58 +129,63 @@ public class Interpreter {
                     }
                     sc.close();
                     new Exit().exitFunction();
+                } else {
+                    new Exit().exitFunction();
                 }
-                ifContinue(ind + 1, cmdBuffer, fromCmd);
+                ifContinue(ind + 1, cmdBuffer, fromCmd, false);
             }
             if (cmdBuffer[ind].equals("create")) {
                 isCommand = true;
-                //if (tableIsChosen) {
-                    ++ind;
-                    ifContinue(ind, cmdBuffer, fromCmd);
-                    String name = cmdBuffer[ind];
-                    ++ind;
-                    ifContinue(ind, cmdBuffer, fromCmd);
-                    if (!cmdBuffer[ind].substring(0, 1).equals("(")) {
-                        isCommand = false;
-                        System.err.println("incorrect syntax");
+                ++ind;
+                ifContinue(ind, cmdBuffer, fromCmd, false);
+                String name = cmdBuffer[ind];
+                ++ind;
+                ifContinue(ind, cmdBuffer, fromCmd, true);
+                if (!cmdBuffer[ind].substring(0, 1).equals("(")) {
+                    isCommand = false;
+                    System.err.println("incorrect syntax");
+                    if (fromCmd) {
                         continue;
+                    } else {
+                        getInputData();
                     }
-                    int startInd = ind;
-                    while (!cmdBuffer[ind].substring(cmdBuffer[ind].length() - 1,
-                            cmdBuffer[ind].length()).equals(")")) {
-                        ++ind;
-                        ifContinue(ind, cmdBuffer, fromCmd);
-                    }
-                    int finishInd = ind;
-                    String types = new String();
-                    for (int i = startInd; i <= finishInd; ++i) {
-                        types += cmdBuffer[i];
-                    }
-                    types.replaceAll("\\s+", "");
-                    types = types.substring(1, types.length() - 1);
-                    String[] typeArr = types.split(",");
-                    List<Class<?>> list = new LinkedList<Class<?>>();
-                    for (String type : typeArr) {
-                        list.add(getType(type));
-                    }
-                    new ObjectTableProvider().createTable(name, list);
-                ifContinue(ind + 1, cmdBuffer, fromCmd);
+                }
+                int startInd = ind;
+                while (!cmdBuffer[ind].substring(cmdBuffer[ind].length() - 1,
+                                                 cmdBuffer[ind].length()).equals(")")) {
+                    ++ind;
+                    ifContinue(ind, cmdBuffer, fromCmd, false);
+                }
+                int finishInd = ind;
+                String types = new String();
+                for (int i = startInd; i <= finishInd; ++i) {
+                    types += cmdBuffer[i];
+                }
+                types.replaceAll("\\s+", "");
+                types = types.substring(1, types.length() - 1);
+                String[] typeArr = types.split(",");
+                List<Class<?>> list = new LinkedList<Class<?>>();
+                for (String type : typeArr) {
+                    list.add(getType(type));
+                }
+                new ObjectTableProvider().createTable(name, list);
+                ifContinue(ind + 1, cmdBuffer, fromCmd, false);
             }
             if (cmdBuffer[ind].equals("drop")) {
                 isCommand = true;
                 ++ind;
-                ifContinue(ind, cmdBuffer, fromCmd);
+                ifContinue(ind, cmdBuffer, fromCmd, false);
                 if (new File(tableName).getName().equals(cmdBuffer[ind])) {
                     tableName = null;
                     tableIsChosen = false;
                 }
                 new ObjectTableProvider().removeTable(tableName);
-                ifContinue(ind + 1, cmdBuffer, fromCmd);
+                ifContinue(ind + 1, cmdBuffer, fromCmd, false);
             }
             if (cmdBuffer[ind].equals("use")) {
                 isCommand = true;
                 ++ind;
-                ifContinue(ind, cmdBuffer, fromCmd);
+                ifContinue(ind, cmdBuffer, fromCmd, false);
                 if (new Exit().exitAndUseAvailable()) {
                     if (storage.isEmpty()) {
                         new Use().useFunction(cmdBuffer[ind], tableName);
@@ -196,16 +198,16 @@ public class Interpreter {
                         System.out.println(storage.size() + " unsaved changes");
                     }
                 }
-                ifContinue(ind + 1, cmdBuffer, fromCmd);
+                ifContinue(ind + 1, cmdBuffer, fromCmd, false);
             }
             if (cmdBuffer[ind].equals("show")) {
                 ++ind;
-                ifContinue(ind, cmdBuffer, fromCmd);
+                ifContinue(ind, cmdBuffer, fromCmd, false);
                 if (cmdBuffer[ind].equals("tables")) {
                     isCommand = true;
                     new ObjectTableProvider().getTableNames();
                 }
-                ifContinue(ind + 1, cmdBuffer, fromCmd);
+                ifContinue(ind + 1, cmdBuffer, fromCmd, false);
             }
             if (cmdBuffer[ind].equals("rollback")) {
                 isCommand = true;
@@ -214,7 +216,7 @@ public class Interpreter {
                 } else {
                     System.out.println("no table");
                 }
-                ifContinue(ind + 1, cmdBuffer, fromCmd);
+                ifContinue(ind + 1, cmdBuffer, fromCmd, false);
             }
             if (cmdBuffer[ind].equals("commit")) {
                 isCommand = true;
@@ -223,21 +225,20 @@ public class Interpreter {
                 } else {
                     System.out.println("no table");
                 }
-                ifContinue(ind + 1, cmdBuffer, fromCmd);
+                ifContinue(ind + 1, cmdBuffer, fromCmd, false);
             }
             ++ind;
             if (!isCommand) {
-                System.err.println("incorrect syntax");
                 if (fromCmd) {
                     System.exit(1);
                 }
-                ifContinue(ind + 1, cmdBuffer, fromCmd);
+                ifContinue(ind + 1, cmdBuffer, fromCmd, true);
             }
         }
     }
     boolean isType(String typeName) {
         if (typeName.equals("int") || typeName.equals("long") || typeName.equals("byte") || typeName.equals("float")
-                || typeName.equals("double") || typeName.equals("boolean") || typeName.equals("String")) {
+            || typeName.equals("double") || typeName.equals("boolean") || typeName.equals("String")) {
             return true;
         }
         return false;
@@ -270,15 +271,17 @@ public class Interpreter {
         ObjectStoreable storeableToReturn = new ObjectStoreable(value);
         return storeableToReturn;
     }
-    void ifContinue(int ind, String[] cmdBuffer, boolean fromCmd) throws Exception {
+    void ifContinue(int ind, String[] cmdBuffer, boolean fromCmd, boolean calledByIncorrectSyntax) throws Exception {
         if (ind >= cmdBuffer.length) {
             if (fromCmd) {
                 System.err.println("incorrect syntax");
                 System.exit(1);
             } else {
-                getInputData();
+                if (calledByIncorrectSyntax) {
+                    System.err.println("incorrect syntax");
+                    getInputData();
+                }
             }
         }
     }
-
 }
