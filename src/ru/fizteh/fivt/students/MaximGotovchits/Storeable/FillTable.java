@@ -9,13 +9,12 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 public class FillTable extends CommandsTools {
-    int dirAndFileNum = 16;
-    public void fillTableFunction(String tableName) throws Exception {
-        for (Map.Entry<String, ObjectStoreable> entry : commitStorage.entrySet()) {
+    public void fillTableFunction(ObjectTable usingTable) throws Exception {
+        for (Map.Entry<String, ObjectStoreable> entry : usingTable.commitStorage.entrySet()) {
             int hashCode = entry.getKey().hashCode();
-            Integer nDirectory = hashCode % dirAndFileNum;
-            Integer nFile = hashCode / dirAndFileNum % dirAndFileNum;
-            Path fileName = Paths.get(tableName, nDirectory + dirExt);
+            Integer nDirectory = hashCode % dirNum;
+            Integer nFile = hashCode / dirNum % fileNum;
+            Path fileName = Paths.get(dataBaseName + File.separator + usingTable.getName(), nDirectory + dirExt);
             File file = new File(fileName.toString());
             if (!file.exists()) {
                 file.mkdir();
@@ -30,7 +29,7 @@ public class FillTable extends CommandsTools {
             stream.write((int) bytesKey.length);
             stream.write(bytesKey);
             byte[] bytesVal = ((" " + entry.getValue().serialisedValue + " ").getBytes(StandardCharsets.UTF_8));
-            stream.write((int) bytesVal.length);
+            stream.write((int) bytesVal.length - 1);
             stream.write(bytesVal);
             stream.close();
         }

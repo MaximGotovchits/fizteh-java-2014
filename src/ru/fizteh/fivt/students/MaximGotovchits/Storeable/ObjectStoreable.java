@@ -8,14 +8,10 @@ import java.util.List;
 import java.util.Objects;
 
 public class ObjectStoreable extends CommandsTools implements Storeable {
-    public List<Object> subValueList = new LinkedList<Object>();
+    public List<Object> subValueList = new LinkedList<>();
     public String serialisedValue = new String();
-    public List<Class<?>> typeKeeper = new LinkedList<Class<?>>();
-    public ObjectStoreable() {
-        serialisedValue = "";
-        subValueList = new LinkedList<Object>();
-        typeKeeper = new LinkedList<Class<?>>();
-    }
+    public List<Class<?>> typeKeeper = new LinkedList<>();
+    public ObjectStoreable() {}
     public ObjectStoreable(List<?> values) {
         int ind = 0;
         serialisedValue = "[";
@@ -23,7 +19,7 @@ public class ObjectStoreable extends CommandsTools implements Storeable {
             subValueList.add(val);
             serialisedValue += val + ", ";
         }
-        serialisedValue = serialisedValue.substring(0, serialisedValue.length() - 2); // Откусить ", ".
+        serialisedValue = serialisedValue.substring(0, serialisedValue.length() - 2);
         serialisedValue += "]";
     }
     public ObjectStoreable(Storeable value) {
@@ -48,12 +44,11 @@ public class ObjectStoreable extends CommandsTools implements Storeable {
         return Objects.hashCode(this.serialisedValue);
     }
     @Override
-    public boolean equals(Object obj) { // Возможно тут нужно было как-то использовать hashCode,
-        // но я не знаю как, особенно если учесть, что он возваращает Objects, а не Object.
+    public boolean equals(Object obj) {
         ObjectStoreable storeableObj = (ObjectStoreable) obj;
         if (this.serialisedValue.equals(storeableObj.serialisedValue)
-            && this.typeKeeper.equals(storeableObj.typeKeeper)
-            && this.subValueList.equals(storeableObj.subValueList)) {
+                && this.typeKeeper.equals(storeableObj.typeKeeper)
+                && this.subValueList.equals(storeableObj.subValueList)) {
             return true;
         }
         return false;
@@ -64,7 +59,7 @@ public class ObjectStoreable extends CommandsTools implements Storeable {
             if (columnIndex >= this.subValueList.size()) {
                 throw new IndexOutOfBoundsException();
             }
-            List<Class<?>> toConvert = new LinkedList<Class<?>>();
+            List<Class<?>> toConvert = new LinkedList<>();
             toConvert.add(value.getClass());
             toConvert = convertToPrimitive(toConvert);
             if (!typeKeeper.get(columnIndex).equals(toConvert.get(0))) {
@@ -200,8 +195,8 @@ public class ObjectStoreable extends CommandsTools implements Storeable {
         }
         return subValueList.get(columnIndex).toString();
     }
-    private List<Class<?>> convertToPrimitive(List<Class<?>> list) { // Этим методом пользуюсь только я.
-        List<Class<?>> toReturn = new LinkedList<Class<?>>();
+    private List<Class<?>> convertToPrimitive(List<Class<?>> list) {
+        List<Class<?>> toReturn = new LinkedList<>();
         for (Class<?> object : list) {
             if (object.equals(Integer.class)) {
                 toReturn.add(int.class);

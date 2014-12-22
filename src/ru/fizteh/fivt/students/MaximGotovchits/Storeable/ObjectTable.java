@@ -12,16 +12,14 @@ import java.util.*;
 
 public class ObjectTable extends CommandsTools implements Table {
     static int overwriteNum = 0;
-    public String tableName;
+    public Stack lastChanges = new Stack();
+    public Map<String, ObjectStoreable> storage = new HashMap<String, ObjectStoreable>();
+    public Map<String, ObjectStoreable> commitStorage = new HashMap<String, ObjectStoreable>();
+    public String tableName = new String();
     public List<Class<?>> typeKeeper = new LinkedList<Class<?>>();
     public ObjectTable() {
-        if (usingTable != null && typeKeeper != null) {
-            tableName = usingTable;
-            typeKeeper = currentTableObject.typeKeeper;
-        } else {
-            tableName = "";
-            typeKeeper = new LinkedList<Class<?>>();
-        }
+        tableName = usingTableName;
+        typeKeeper = currentTableObject.typeKeeper;
     }
     public ObjectTable(Table table) {
         ObjectTable temp = (ObjectTable) table;
@@ -29,23 +27,22 @@ public class ObjectTable extends CommandsTools implements Table {
         this.typeKeeper = temp.typeKeeper;
     }
     public ObjectTable(String name) {
+        if (!new File(name).isAbsolute()) {
+            name = dataBaseName + File.separator + name;
+        }
         this.tableName = new File(name).getName();
         String content = new String();
         try {
             if (!new File(name + File.separator + signatureFileName).isAbsolute()) {
                 name = dataBaseName + File.separator + name;
             }
-            if (new File(name).isDirectory()) {
-                content = readFile(name + File.separator + signatureFileName, Charset.defaultCharset());
-                content.replaceAll("\\s+", " ");
-                String[] types = content.split(" ");
-                int ind = 0;
-                for (String type : types) {
-                    this.typeKeeper.add(ind, getType(type));
-                    ++ind;
-                }
-            } else {
-                System.err.println(new File(name).getName() + " is not a directory");
+            content = readFile(name + File.separator + signatureFileName, Charset.defaultCharset());
+            content.replaceAll("\\s+", " ");
+            String[] types = content.split(" ");
+            int ind = 0;
+            for (String type : types) {
+                typeKeeper.add(ind, getType(type));
+                ++ind;
             }
         } catch (IOException s) {
             System.err.println(s);
@@ -89,7 +86,7 @@ public class ObjectTable extends CommandsTools implements Table {
         }
         ObjectStoreable value = storage.get(key);
         if (value == null) {
-            System.out.println("not found");
+            System.err.println("not found");
             return null;
         }
         String serializedValue = value.serialisedValue;
@@ -141,6 +138,7 @@ public class ObjectTable extends CommandsTools implements Table {
             return null;
         }
         ObjectStoreable value = storage.remove(key);
+        commitStorage.remove(key);
         if (value != null) {
             lastChanges.push(value);
             lastChanges.push(key);
@@ -185,7 +183,7 @@ public class ObjectTable extends CommandsTools implements Table {
     @Override
     public int rollback() throws IllegalArgumentException {
         int changes = Math.abs(storage.size() - commitStorage.size() + overwriteNum);
-        while (!lastChanges.isEmpty()) {
+            while (!lastChanges.isEmpty()) {
             Object tmpCmd = lastChanges.pop();
             if (tmpCmd.equals("put")) {
                 String key = lastChanges.pop().toString();
@@ -225,7 +223,7 @@ public class ObjectTable extends CommandsTools implements Table {
     static String readFile(String path, Charset encoding) throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         String temp = new String(encoded, encoding);
-        return temp.substring(0, temp.length() - 1); // Можно было поставить -2. Это зависит от настроек IDE.
+        return temp.replaceAll("^\\s*|\\s*$", "");
     }
     private Class<?> getType(String typeName) {
         if (typeName.equals("int")) {
