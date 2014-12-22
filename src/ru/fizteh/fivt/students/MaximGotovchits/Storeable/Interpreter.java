@@ -124,7 +124,7 @@ public class Interpreter extends CommandsTools {
             try {
                 new ObjectTableProvider().removeTable(cmd[1]);
             } catch (Exception e) {
-
+                System.err.println(e);
             }
             ifContinue(fromCmdLine);
         }
