@@ -13,8 +13,8 @@ import java.util.*;
 public class ObjectTable extends CommandsTools implements Table {
     static int overwriteNum = 0;
     public Stack lastChanges = new Stack();
-    public Map<String, ObjectStoreable> storage = new HashMap<String, ObjectStoreable>();
-    public Map<String, ObjectStoreable> commitStorage = new HashMap<String, ObjectStoreable>();
+    public Map<String, ObjectStoreable> storage = new HashMap<>();
+    public Map<String, ObjectStoreable> commitStorage = new HashMap<>();
     public String tableName = new String();
     public List<Class<?>> typeKeeper = new LinkedList<Class<?>>();
     public ObjectTable() {
@@ -76,13 +76,8 @@ public class ObjectTable extends CommandsTools implements Table {
     public Storeable get(String key) throws IllegalArgumentException { // В документации в Index
         // не сказано, когда кидать ParseException, однако согласно интерфейсу тут все-таки написано
         // throws ParseException, но на самом деле это исключение тут не бросатется.
-        try {
-            if (key == null) {
-                throw new IllegalArgumentException();
-            }
-        } catch (IllegalArgumentException s) {
-            System.err.println(s);
-            return null;
+        if (key == null) {
+            throw new IllegalArgumentException();
         }
         ObjectStoreable value = storage.get(key);
         if (value == null) {
@@ -96,21 +91,11 @@ public class ObjectTable extends CommandsTools implements Table {
     }
     @Override
     public Storeable put(String key, Storeable value) throws ColumnFormatException {
-        try {
-            if (key == null || value == null) {
-                throw new IllegalArgumentException();
-            }
-        } catch (IllegalArgumentException s) {
-            System.err.println(s);
-            return null;
+        if (key == null || value == null) {
+            throw new IllegalArgumentException();
         }
-        try {
-            if (!this.typeKeeper.equals(((ObjectStoreable) value).typeKeeper)) {
-                throw new ColumnFormatException();
-            }
-        } catch (ColumnFormatException s) {
-            System.err.println(s);
-            return null;
+        if (!this.typeKeeper.equals(((ObjectStoreable) value).typeKeeper)) {
+            throw new ColumnFormatException();
         }
         ObjectStoreable previousValue = storage.put(key, (ObjectStoreable) value);
         if (previousValue == null) {
@@ -129,13 +114,8 @@ public class ObjectTable extends CommandsTools implements Table {
     }
     @Override
     public Storeable remove(String key) {
-        try {
-            if (key == null) {
-                throw new IllegalArgumentException();
-            }
-        } catch (IllegalArgumentException s) {
-            System.err.println(s);
-            return null;
+        if (key == null) {
+            throw new IllegalArgumentException();
         }
         ObjectStoreable value = storage.remove(key);
         commitStorage.remove(key);
@@ -209,13 +189,8 @@ public class ObjectTable extends CommandsTools implements Table {
     }
     @Override
     public Class<?> getColumnType(int columnIndex) throws IndexOutOfBoundsException {
-        try {
-            if (this.getColumnsCount() < columnIndex - 1) {
-                throw new IndexOutOfBoundsException();
-            }
-        } catch (IndexOutOfBoundsException s) {
-            System.err.println(s);
-            return null;
+        if (this.getColumnsCount() < columnIndex - 1) {
+            throw new IndexOutOfBoundsException();
         }
         Class<?> objectToReturn = typeKeeper.get(columnIndex);
         return objectToReturn;

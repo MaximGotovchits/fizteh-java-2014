@@ -1,7 +1,7 @@
 package ru.fizteh.fivt.students.MaximGotovchits.Storeable;
 
 public abstract class CommandsTools {
-    static final String JSON_REG_EX = "\\s*,\\s*(?=(?:(?:[^\"]*\"){2})*[^\"]*$)"; // Removes the braces
+    static final String JSON_REG_EX = "\\s*,\\s*(?=(?:(?:[^\"]*\"){2})*[^\"]*$)"; // Removes commas
     // outside of "...".
     static String usingTableName = new String();
     static ObjectTable currentTableObject;

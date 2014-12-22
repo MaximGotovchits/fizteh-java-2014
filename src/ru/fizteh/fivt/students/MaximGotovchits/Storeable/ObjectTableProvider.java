@@ -26,10 +26,7 @@ public class ObjectTableProvider extends CommandsTools implements TableProvider 
     @Override
     public boolean equals(Object obj) {
         ObjectTableProvider tempObj = (ObjectTableProvider) obj;
-        if (tempObj.rootDirectory.equals(this.rootDirectory)) {
-            return true;
-        }
-        return false;
+        return tempObj.rootDirectory.equals(this.rootDirectory);
     }
     @Override
     public Table getTable(String name) throws IllegalArgumentException {
@@ -40,7 +37,7 @@ public class ObjectTableProvider extends CommandsTools implements TableProvider 
         return null;
     }
     @Override
-    public Table createTable(String name, List<Class<?>> columnTypes) throws IOException {
+    public Table createTable(String name, List<Class<?>> columnTypes) throws IOException, IllegalArgumentException  {
         checkException(name);
         File file = new File(rootDirectory + File.separator + name);
         File signatureFile = new File(rootDirectory + File.separator + name + File.separator + signatureFileName);
@@ -67,36 +64,28 @@ public class ObjectTableProvider extends CommandsTools implements TableProvider 
     }
     @Override
     public void removeTable(String name) throws IllegalArgumentException, IllegalStateException {
-        try {
-            if (name == null || name.length() > longestName) {
-                throw new IllegalArgumentException();
-            }
-            String tableName = rootDirectory + File.separator + name;
-            File toBeRemoved = new File(tableName);
-            if (toBeRemoved.exists()) {
-                if (tableIsChosen) {
-                    if (usingTableName.equals(name)) {
-                        currentTableObject.storage.clear();
-                        currentTableObject.commitStorage.clear();
-                        //currentTableObject.uncommitedChanges = 0;
-                        tableIsChosen = false;
-                        usingTableName = null;
-                    }
+        if (name == null || name.length() > longestName) {
+            throw new IllegalArgumentException();
+        }
+        String tableName = rootDirectory + File.separator + name;
+        File toBeRemoved = new File(tableName);
+        if (toBeRemoved.exists()) {
+            if (tableIsChosen) {
+                if (usingTableName.equals(name)) {
+                    currentTableObject.storage.clear();
+                    currentTableObject.commitStorage.clear();
+                    tableIsChosen = false;
+                    usingTableName = null;
                 }
-                recRem(tableName);
-                toBeRemoved.delete();
-                System.out.println("dropped");
-            } else {
-                throw new IllegalStateException();
             }
-        } catch (IllegalArgumentException s) {
-            System.err.println(s);
-            return;
-        } catch (IllegalStateException s) {
-            System.err.println(s);
-            return;
+            recRem(tableName);
+            toBeRemoved.delete();
+            System.out.println("dropped");
+        } else {
+            throw new IllegalStateException();
         }
     }
+
     @Override
     public Storeable deserialize(Table table, String value) throws ParseException {
         ObjectTable usingTable = (ObjectTable) table;
@@ -114,16 +103,12 @@ public class ObjectTableProvider extends CommandsTools implements TableProvider 
         int index = 0;
         List<Class<?>> typeList = new LinkedList<>();
         for (String str : tempValue) {
-            try {
-                Object val = getValue(str, usingTable, usingTable.typeKeeper.get(index));
-                if (val.equals("^incorrect$")) {
-                    throw new ParseException(value, 0);
-                }
-                valueToReturn.subValueList.add(val);
-                typeList.add(val.getClass());
-            } catch (NumberFormatException e) {
+            Object val = getValue(str, usingTable, usingTable.typeKeeper.get(index));
+            if (val.equals("^incorrect$")) {
                 throw new ParseException(value, 0);
             }
+            valueToReturn.subValueList.add(val);
+            typeList.add(val.getClass());
             ++index;
         }
         valueToReturn.typeKeeper = usingTable.typeKeeper;
@@ -134,17 +119,12 @@ public class ObjectTableProvider extends CommandsTools implements TableProvider 
     public String serialize(Table table, Storeable value) throws ColumnFormatException {
         ObjectStoreable valueToSerialize = (ObjectStoreable) value;
         ObjectTable tableObj = (ObjectTable) table;
-        try {
-            int index = 0;
-            for (Class<?> type : tableObj.typeKeeper) {
-                if (!type.equals(valueToSerialize.typeKeeper.get(index))) {
-                    throw new ColumnFormatException();
-                }
-                ++index;
+        int index = 0;
+        for (Class<?> type : tableObj.typeKeeper) {
+            if (!type.equals(valueToSerialize.typeKeeper.get(index))) {
+                throw new ColumnFormatException();
             }
-        } catch (ColumnFormatException s) {
-            System.out.println(s);
-            return null;
+            ++index;
         }
         return valueToSerialize.serialisedValue;
     }
@@ -158,23 +138,13 @@ public class ObjectTableProvider extends CommandsTools implements TableProvider 
     public Storeable createFor(Table table, List<?> values) throws ColumnFormatException, IndexOutOfBoundsException {
         int ind = 0;
         ObjectTable tempTable = new ObjectTable(table);
-        try {
-            List<Class<?>> valTypes = new LinkedList<Class<?>>();
-            valTypes = convertToPrimitive(values);
-            if (values.size() != tempTable.getColumnsCount()) {
-                throw new IndexOutOfBoundsException();
-            }
-            Class<?> tableType;
-            Class<?> valueType;
-            if (!valTypes.equals(tempTable.typeKeeper)) {
-                throw new ColumnFormatException();
-            }
-        } catch (ColumnFormatException s) {
-            System.err.println(s);
-            return null;
-        } catch (IndexOutOfBoundsException s) {
-            System.err.println(s);
-            return null;
+        List<Class<?>> valTypes = new LinkedList<Class<?>>();
+        valTypes = convertToPrimitive(values);
+        if (values.size() != tempTable.getColumnsCount()) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (!valTypes.equals(tempTable.typeKeeper)) {
+            throw new ColumnFormatException();
         }
         ObjectStoreable toReturn = new ObjectStoreable(values);
         toReturn.typeKeeper = tempTable.typeKeeper;
@@ -207,7 +177,9 @@ public class ObjectTableProvider extends CommandsTools implements TableProvider 
                                     String temp = new String(data, StandardCharsets.UTF_8);
                                     recordsAmount += (temp.length() - temp.replaceAll(" ", "").length()) / 4;
                                 }
-                            } catch (IOException s) {
+                            } catch (FileNotFoundException e) {
+                                return null;
+                            } catch (IOException e) {
                                 return null;
                             }
                         }
@@ -298,16 +270,10 @@ public class ObjectTableProvider extends CommandsTools implements TableProvider 
         file.delete();
     }
 
-    public Object checkException(String name) throws IllegalArgumentException {
-        try {
-            if (name == null || name.length() > longestName) {
-                throw new IllegalArgumentException();
-            }
-        } catch (IllegalArgumentException s) {
-            System.err.println(s);
-            return null;
+    public void checkException(String name) throws IllegalArgumentException {
+        if (name == null || name.length() > longestName) {
+            throw new IllegalArgumentException();
         }
-        return null;
     }
 
     private List<Class<?>> convertToPrimitive(List<?> list) {

@@ -34,7 +34,7 @@ public class Interpreter extends CommandsTools {
                 typeList = getTypeList(createParameter, fromCmdLine);
                 new ObjectTableProvider().createTable(tableName, typeList);
             } catch (Exception e) {
-                printExceptionMessage(e);
+                System.err.println(e);
             }
             ifContinue(fromCmdLine);
         }
@@ -67,7 +67,7 @@ public class Interpreter extends CommandsTools {
                             deserialize(currentTableObject, putParameter);
                     currentTableObject.put(key, value);
                 } catch (Exception e) {
-                    printExceptionMessage(e);
+                    System.err.println(e);
                 }
             } else {
                 informToChooseTable();
@@ -86,10 +86,14 @@ public class Interpreter extends CommandsTools {
         }
 
         if (cmd[0].equals("get") && cmd.length == 2) {
-            if (tableIsChosen) {
-                currentTableObject.get(cmd[1]);
-            } else {
-                informToChooseTable();
+            try {
+                if (tableIsChosen) {
+                    currentTableObject.get(cmd[1]);
+                } else {
+                    informToChooseTable();
+                }
+            } catch (Exception e) {
+                System.out.println(e);
             }
             ifContinue(fromCmdLine);
         }
@@ -105,7 +109,11 @@ public class Interpreter extends CommandsTools {
 
         if (cmd[0].equals("remove") && cmd.length == 2) {
             if (tableIsChosen) {
-                currentTableObject.remove(cmd[1]);
+                try {
+                    currentTableObject.remove(cmd[1]);
+                } catch (Exception e) {
+                    System.err.println(e);
+                }
             } else {
                 informToChooseTable();
             }
@@ -113,7 +121,11 @@ public class Interpreter extends CommandsTools {
         }
 
         if (cmd[0].equals("drop") && cmd.length == 2) {
-            new ObjectTableProvider().removeTable(cmd[1]);
+            try {
+                new ObjectTableProvider().removeTable(cmd[1]);
+            } catch (Exception e) {
+
+            }
             ifContinue(fromCmdLine);
         }
 
