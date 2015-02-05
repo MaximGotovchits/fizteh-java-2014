@@ -1,4 +1,4 @@
-package ru.fizteh.fivt.students.MaximGotovchits.Parallel;
+package ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG;
 
 import ru.fizteh.fivt.storage.structured.ColumnFormatException;
 import ru.fizteh.fivt.storage.structured.Storeable;
@@ -13,19 +13,35 @@ import java.util.Objects;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class ObjectTableProvider extends CommandsTools implements TableProvider {
+public class ObjectTableProvider implements TableProvider {
+    private static final String BRACES_KILLER = "^\\s*\\[\\s*|\\s*\\]\\s*$";
+    private static final String FILE_EXT = ".dat";
+    private static final Integer FILE_NUM = 16;
+    private static final String DIR_EXT = ".dir";
+    private static final Integer DIR_NUM = 16;
+    private static final String JSON_REG_EX = "\\s*,\\s*(?=(?:(?:[^\"]*\"){2})*[^\"]*$)";
+    private static String usingTableName;
+    private static ObjectTable currentTableObject;
+    private static final int LONGEST_NAME = 260;
+    private static final String SIGNATURE_FILENAME = "signature.tsv";
+    private static Boolean tableIsChosen = false;
+    private static String dataBaseName = System.getProperty("fizteh.db.dir");
     private volatile boolean writeSectionIsInUse = false;
     private String rootDirectory = new String();
+
     public ObjectTableProvider() {
         rootDirectory = dataBaseName;
     }
+
     public ObjectTableProvider(String dir) {
         dataBaseName = dir;
         rootDirectory = dir;
     }
+
     public int hashCode() {
         return Objects.hashCode(this.rootDirectory);
     }
+
     @Override
     public boolean equals(Object obj) {
         ObjectTableProvider tempObj = (ObjectTableProvider) obj;
@@ -53,7 +69,7 @@ public class ObjectTableProvider extends CommandsTools implements TableProvider 
         readWriteLock.writeLock().lock();
         checkException(name);
         File file = new File(rootDirectory + File.separator + name);
-        File signatureFile = new File(rootDirectory + File.separator + name + File.separator + signatureFileName);
+        File signatureFile = new File(rootDirectory + File.separator + name + File.separator + SIGNATURE_FILENAME);
         if (file.exists()) {
             System.out.println(name + " exists");
         } else {
@@ -79,7 +95,7 @@ public class ObjectTableProvider extends CommandsTools implements TableProvider 
     }
     @Override
     public void removeTable(String name) throws IllegalArgumentException, IllegalStateException {
-        if (name == null || name.length() > longestName) {
+        if (name == null || name.length() > LONGEST_NAME) {
             throw new IllegalArgumentException();
         }
         String tableName = rootDirectory + File.separator + name;
@@ -110,7 +126,7 @@ public class ObjectTableProvider extends CommandsTools implements TableProvider 
             throw new ParseException(value, 0);
         }
         valueToReturn.serialisedValue = value;
-        value = value.replaceAll("^\\s*\\[\\s*|\\s*\\]\\s*$", ""); // Removing [ and ].
+        value = value.replaceAll(BRACES_KILLER, ""); // Removing [ and ].
         String[] tempValue = value.split(JSON_REG_EX); // Split by comma.
         if (usingTable.getColumnsCount() != tempValue.length) {
             throw new ParseException(value, 0);
@@ -175,14 +191,14 @@ public class ObjectTableProvider extends CommandsTools implements TableProvider 
         for (File sub : file.listFiles()) {
             if ((!sub.isHidden()) && sub.isDirectory()) {
                 recordsAmount = 0;
-                for (Integer i = 0; i < dirNum; ++i) {
+                for (Integer i = 0; i < DIR_NUM; ++i) {
                     currentFile = rootDirectory + File.separator + sub.getName() + File.separator
-                            + i + dirExt;
+                            + i + DIR_EXT;
                     File file1 = new File(currentFile);
                     if (file1.exists()) {
-                        for (Integer j = 0; j < fileNum; ++j) {
+                        for (Integer j = 0; j < FILE_NUM; ++j) {
                             currentFile = rootDirectory + File.separator + sub.getName() + File.separator
-                                    + i + dirExt + File.separator + j + fileExt;
+                                    + i + DIR_EXT + File.separator + j + FILE_EXT;
                             file1 = new File(currentFile);
                             try {
                                 if (file1.exists()) {
@@ -286,7 +302,7 @@ public class ObjectTableProvider extends CommandsTools implements TableProvider 
     }
 
     public void checkException(String name) throws IllegalArgumentException {
-        if (name == null || name.length() > longestName) {
+        if (name == null || name.length() > LONGEST_NAME) {
             throw new IllegalArgumentException();
         }
     }

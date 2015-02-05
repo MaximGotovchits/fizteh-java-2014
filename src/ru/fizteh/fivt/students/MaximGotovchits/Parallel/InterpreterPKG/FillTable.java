@@ -1,5 +1,7 @@
-package ru.fizteh.fivt.students.MaximGotovchits.Parallel;
+package ru.fizteh.fivt.students.MaximGotovchits.Parallel.InterpreterPKG;
 
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG.ObjectStoreable;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG.ObjectTable;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -8,18 +10,23 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
-public class FillTable extends CommandsTools {
+public class FillTable {
+    private static final String FILE_EXT = ".dat";
+    private static final Integer FILE_NUM = 16;
+    private static final String DIR_EXT = ".dir";
+    private static final Integer DIR_NUM = 16;
+    private static final String DATA_BASE_NAME = System.getProperty("fizteh.db.dir");
     public void fillTableFunction(ObjectTable usingTable) throws Exception {
         for (Map.Entry<String, ObjectStoreable> entry : usingTable.commitStorage.entrySet()) {
             int hashCode = entry.getKey().hashCode();
-            Integer nDirectory = hashCode % dirNum;
-            Integer nFile = hashCode / dirNum % fileNum;
-            Path fileName = Paths.get(dataBaseName + File.separator + usingTable.getName(), nDirectory + dirExt);
+            Integer nDirectory = hashCode % DIR_NUM;
+            Integer nFile = hashCode / DIR_NUM % FILE_NUM;
+            Path fileName = Paths.get(DATA_BASE_NAME + File.separator + usingTable.getName(), nDirectory + DIR_EXT);
             File file = new File(fileName.toString());
             if (!file.exists()) {
                 file.mkdir();
             }
-            fileName = Paths.get(fileName.toString(), nFile + fileExt);
+            fileName = Paths.get(fileName.toString(), nFile + FILE_EXT);
             file = new File(fileName.toString());
             if (!file.exists()) {
                 file.createNewFile();

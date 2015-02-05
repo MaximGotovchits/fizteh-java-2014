@@ -1,4 +1,8 @@
-package ru.fizteh.fivt.students.MaximGotovchits.Parallel;
+package ru.fizteh.fivt.students.MaximGotovchits.Parallel.BasePKG;
+
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.InterpreterPKG.Interpreter;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.InterpreterPKG.MakeDirs;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.InterpreterPKG.Exit;
 
 public class Main { // Using JSON format.
     public static void main(final String[] args) throws Exception {

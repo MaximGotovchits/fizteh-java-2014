@@ -1,27 +1,31 @@
-package ru.fizteh.fivt.students.MaximGotovchits.Parallel;
+package ru.fizteh.fivt.students.MaximGotovchits.Parallel.InterpreterPKG;
 
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG.ObjectStoreable;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG.ObjectTable;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG.ObjectTableProvider;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 
-public class Use extends CommandsTools {
+public class Use {
     public boolean useFunction(String tableName, String oldTableName) throws Exception {
         if (!tableName.equals(oldTableName)) {
             String outputName = tableName;
-            String tablePath = dataBaseName + "/" + tableName;
+            String tablePath = Interpreter.DATA_BASE_NAME + File.separator + tableName;
             File file = new File(tablePath);
             if (file.exists()) {
-                usingTableName = tableName;
-                if (tableIsChosen) {
-                    new FillTable().fillTableFunction(currentTableObject);
-                    currentTableObject.storage.get().clear();
-                    currentTableObject.commitStorage.clear();
+                Interpreter.usingTableName = tableName;
+                if (Interpreter.tableIsChosen) {
+                    new FillTable().fillTableFunction(Interpreter.currentTableObject);
+                    Interpreter.currentTableObject.storage.get().clear();
+                    Interpreter.currentTableObject.commitStorage.clear();
                 }
-                currentTableObject = new ObjectTable(dataBaseName + File.separator + usingTableName);
-                for (Integer i = 0; i < dirNum; ++i) {
-                    for (Integer j = 0; j < fileNum; ++j) {
-                        tablePath = dataBaseName + File.separator + tableName + File.separator
-                                + i + dirExt + File.separator + j + fileExt;
+                Interpreter.currentTableObject = new ObjectTable(Interpreter.DATA_BASE_NAME + File.separator
+                        + Interpreter.usingTableName);
+                for (Integer i = 0; i < Interpreter.dirNum; ++i) {
+                    for (Integer j = 0; j < Interpreter.fileNum; ++j) {
+                        tablePath = Interpreter.DATA_BASE_NAME + File.separator + tableName + File.separator
+                                + i + Interpreter.dirExt + File.separator + j + Interpreter.fileExt;
                         if (new File(tablePath).exists()) {
                             fillStorage(tablePath, file);
                             PrintWriter writer = new PrintWriter(new File(tablePath));
@@ -31,7 +35,7 @@ public class Use extends CommandsTools {
                     }
                 }
                 System.out.println("using " + outputName);
-                tableIsChosen = true;
+                Interpreter.tableIsChosen = true;
             } else {
                 System.err.println(tableName + " not exists");
                 return false;
@@ -39,9 +43,10 @@ public class Use extends CommandsTools {
         } else {
             System.out.println("using " + oldTableName);
         }
-        usingTableName = currentTableObject.getName();
+        Interpreter.usingTableName = Interpreter.currentTableObject.getName();
         return true;
     }
+
     void fillStorage(String datName, File file) throws IOException, ParseException {
         DataInputStream stream = new DataInputStream(new FileInputStream(datName));
         file = new File(datName);
@@ -62,8 +67,8 @@ public class Use extends CommandsTools {
             String tableName = new File(new File(datName).getParent()).getParent();
             ObjectStoreable valForMap = (ObjectStoreable)
                     new ObjectTableProvider().deserialize(new ObjectTable(tableName), value);
-            currentTableObject.storage.get().put(keyForMap, valForMap);
-            currentTableObject.commitStorage.put(keyForMap, valForMap);
+            Interpreter.currentTableObject.storage.get().put(keyForMap, valForMap);
+            Interpreter.currentTableObject.commitStorage.put(keyForMap, valForMap);
             counter = counter + offset + 3;
         }
         stream.close();

@@ -1,11 +1,15 @@
-package ru.fizteh.fivt.students.MaximGotovchits.Parallel.Test;
+package ru.fizteh.fivt.students.MaximGotovchits.Parallel.TestPKG;
 
 import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.*;
 import org.junit.Test;
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.*;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.InterpreterPKG.Use;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG.ObjectStoreable;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG.ObjectTable;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG.ObjectTableProvider;
+
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;

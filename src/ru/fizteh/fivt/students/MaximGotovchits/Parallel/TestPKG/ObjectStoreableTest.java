@@ -1,11 +1,11 @@
-package ru.fizteh.fivt.students.MaximGotovchits.Parallel.Test;
+package ru.fizteh.fivt.students.MaximGotovchits.Parallel.TestPKG;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectStoreable;
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectTable;
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectTableProvider;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG.ObjectStoreable;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG.ObjectTable;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG.ObjectTableProvider;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,7 +16,6 @@ import static org.junit.Assert.assertNotSame;
 public class ObjectStoreableTest {
     public String name;
     public List<Class<?>> columnTypes = new LinkedList<Class<?>>();
-    //public ObjectTable tableToCompare = new ObjectTable();
     public ObjectStoreable deserializedValue = new ObjectStoreable();
     public ObjectTable table;
     public String valueToDeserialize;
@@ -31,8 +30,6 @@ public class ObjectStoreableTest {
         columnTypes.add(byte.class);
         columnTypes.add(boolean.class);
         columnTypes.add(String.class);
-        //tableToCompare.typeKeeper = columnTypes;
-        //tableToCompare.tableName = name;
         deserializedValue.subValueList.add(100500);
         deserializedValue.subValueList.add((long) 10000000);
         deserializedValue.subValueList.add(123.456);
