@@ -1,4 +1,4 @@
-package ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG;
+package ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects;
 
 import ru.fizteh.fivt.storage.structured.TableProvider;
 import ru.fizteh.fivt.storage.structured.TableProviderFactory;

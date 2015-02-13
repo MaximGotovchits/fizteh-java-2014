@@ -1,8 +1,8 @@
-package ru.fizteh.fivt.students.MaximGotovchits.Parallel.TestPKG;
+package ru.fizteh.fivt.students.MaximGotovchits.Parallel.test;
 
 import org.junit.Test;
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG.ObjectTableProvider;
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG.ObjectTableProviderFactory;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTableProvider;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTableProviderFactory;
 import static org.junit.Assert.assertEquals;
 
 public class ObjectTableProviderFactoryTest {

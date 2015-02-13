@@ -1,4 +1,4 @@
-package ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG;
+package ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects;
 
 import ru.fizteh.fivt.storage.structured.ColumnFormatException;
 import ru.fizteh.fivt.storage.structured.Storeable;
@@ -36,6 +36,8 @@ public class ObjectTable implements Table {
     public Map<String, ObjectStoreable> commitStorage = new HashMap<>();
     public String tableName = new String();
     public List<Class<?>> typeKeeper = new LinkedList<Class<?>>();
+
+    public ObjectTable() { }
 
     public ObjectTable(Table table) {
         ObjectTable temp = (ObjectTable) table;
@@ -220,9 +222,7 @@ public class ObjectTable implements Table {
         return temp.replaceAll("^\\s*|\\s*$", "");
     }
 
-
-
-    private Class<?> getType(String typeName) {
+    public Class<?> getType(String typeName) {
         if (typeName.equals("int")) {
             return int.class;
         }

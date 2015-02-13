@@ -1,10 +1,10 @@
-package ru.fizteh.fivt.students.MaximGotovchits.Parallel.TestPKG;
+package ru.fizteh.fivt.students.MaximGotovchits.Parallel.test;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.*;
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG.ObjectStoreable;
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG.ObjectTable;
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG.ObjectTableProvider;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectStoreable;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTable;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTableProvider;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,20 +41,20 @@ public class ObjectTableProviderTest extends ObjectTableProvider {
         assertEquals(null, createTable(name, columnTypes));
         assertEquals(testTable, getTable(name));
     }
-   // @TestPKG
+   // @test
    // public void deserializeTest() throws ParseException, IOException {
    //     assertEquals(deserializedValue, (ObjectStoreable) deserialize(table, valueToDeserialize));
    // }
-    /*@TestPKG(expected = IllegalArgumentException.class) // Это была попытка сделать тест на исключения.
+    /*@test(expected = IllegalArgumentException.class) // Это была попытка сделать тест на исключения.
         //В следующей задаче я постараюсь это сделать. Просто нужно изменять кучу кода.
     public void createNullTableTest() throws IOException {
         createTable(null, columnTypes);
     }*/
-    /*@TestPKG
+    /*@test
     public void serializeTest() {
         assertEquals(valueToDeserialize, serialize(table, deserializedValue));
     }
-    @TestPKG
+    @test
     public void createForTest() {
         ObjectStoreable tempStoreable = new ObjectStoreable();
         tempStoreable.typeKeeper = table.typeKeeper;
@@ -64,7 +64,7 @@ public class ObjectTableProviderTest extends ObjectTableProvider {
         ObjectStoreable qq = (ObjectStoreable) createFor(table, deserializedValue.subValueList);
         assertEquals(tempStoreable, (ObjectStoreable) createFor(table, deserializedValue.subValueList));
     }
-    @TestPKG
+    @test
     public void getTableNamesTest() throws IOException { // Конечно же, стоит удостовериться,
     // что в рабочей директории на момент тестирования нет таблиц.
         List<String> toCompare = new LinkedList<String>();

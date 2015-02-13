@@ -1,4 +1,4 @@
-package ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG;
+package ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects;
 
 import ru.fizteh.fivt.storage.structured.ColumnFormatException;
 import ru.fizteh.fivt.storage.structured.Storeable;
@@ -10,30 +10,29 @@ import java.util.Objects;
 public class ObjectStoreable implements Storeable {
     private static final String LEFT_BRACE = "[";
     private static final String RIGHT_BRACE = "]";
-    private static final String COMMA_AND_SPACE = ", ";
+    private static final String VALUE_SEPARATOR = ", ";
     public List<Object> subValueList = new LinkedList<>();
     private static ObjectTable currentTableObject;
-    public String serialisedValue = new String();
+    public String serialisedValue;
     public List<Class<?>> typeKeeper = new LinkedList<>();
 
     public ObjectStoreable() {}
 
     public ObjectStoreable(List<?> values) {
-        int ind = 0;
         serialisedValue = LEFT_BRACE;
         for (Object val : values) {
             subValueList.add(val);
-            serialisedValue += val + COMMA_AND_SPACE;
+            serialisedValue += val + VALUE_SEPARATOR;
         }
         serialisedValue = serialisedValue.substring(0, serialisedValue.length() - 2);
         serialisedValue += RIGHT_BRACE;
     }
 
-    public ObjectStoreable(Storeable value) {
+    /*public ObjectStoreable(Storeable value) {
         subValueList = ((ObjectStoreable) value).subValueList;
         serialisedValue = ((ObjectStoreable) value).serialisedValue;
         typeKeeper = ((ObjectStoreable) value).typeKeeper;
-    }
+    }*/
 
     public ObjectStoreable(ObjectTable table) {
         typeKeeper = table.typeKeeper;
@@ -88,11 +87,10 @@ public class ObjectStoreable implements Storeable {
         this.serialisedValue = "";
         serialisedValue = LEFT_BRACE;
         for (Object val : this.subValueList) {
-            serialisedValue += val + COMMA_AND_SPACE;
+            serialisedValue += val + VALUE_SEPARATOR;
         }
-        serialisedValue = serialisedValue.substring(0, serialisedValue.length() - 2); // Откусить ", ".
+        serialisedValue = serialisedValue.substring(0, serialisedValue.length() - 2);
         serialisedValue += RIGHT_BRACE;
-        return;
     }
 
     @Override

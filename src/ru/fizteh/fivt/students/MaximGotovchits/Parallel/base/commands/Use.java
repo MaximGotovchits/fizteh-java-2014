@@ -1,31 +1,46 @@
-package ru.fizteh.fivt.students.MaximGotovchits.Parallel.InterpreterPKG;
+package ru.fizteh.fivt.students.MaximGotovchits.Parallel.base.commands;
 
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG.ObjectStoreable;
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG.ObjectTable;
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.ObjectsPKG.ObjectTableProvider;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.interpreter.Command;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectStoreable;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTable;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTableProvider;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 
-public class Use {
+public class Use extends Command {
+    @Override
+    public String getCmdName() {
+        return "use";
+    }
+
+    @Override
+    public boolean execute(String[] cmd) throws Exception {
+        if (cmd.length == 2) {
+            useFunction(cmd[1], CommadTools.usingTableName);
+            return true;
+        }
+        return false;
+    }
+
     public boolean useFunction(String tableName, String oldTableName) throws Exception {
         if (!tableName.equals(oldTableName)) {
             String outputName = tableName;
-            String tablePath = Interpreter.DATA_BASE_NAME + File.separator + tableName;
+            String tablePath = CommadTools.DATA_BASE_NAME + File.separator + tableName;
             File file = new File(tablePath);
             if (file.exists()) {
-                Interpreter.usingTableName = tableName;
-                if (Interpreter.tableIsChosen) {
-                    new FillTable().fillTableFunction(Interpreter.currentTableObject);
-                    Interpreter.currentTableObject.storage.get().clear();
-                    Interpreter.currentTableObject.commitStorage.clear();
+                CommadTools.usingTableName = tableName;
+                if (CommadTools.tableIsChosen) {
+                    new FillTable().execute(null);
+                    CommadTools.currentTable.storage.get().clear();
+                    CommadTools.currentTable.commitStorage.clear();
                 }
-                Interpreter.currentTableObject = new ObjectTable(Interpreter.DATA_BASE_NAME + File.separator
-                        + Interpreter.usingTableName);
-                for (Integer i = 0; i < Interpreter.dirNum; ++i) {
-                    for (Integer j = 0; j < Interpreter.fileNum; ++j) {
-                        tablePath = Interpreter.DATA_BASE_NAME + File.separator + tableName + File.separator
-                                + i + Interpreter.dirExt + File.separator + j + Interpreter.fileExt;
+                CommadTools.currentTable = new ObjectTable(CommadTools.DATA_BASE_NAME + File.separator
+                        + CommadTools.usingTableName);
+                for (Integer i = 0; i < CommadTools.DIR_NUM; ++i) {
+                    for (Integer j = 0; j < CommadTools.FILE_NUM; ++j) {
+                        tablePath = CommadTools.DATA_BASE_NAME + File.separator + tableName + File.separator
+                                + i + CommadTools.DIR_EXT + File.separator + j + CommadTools.FILE_EXT;
                         if (new File(tablePath).exists()) {
                             fillStorage(tablePath, file);
                             PrintWriter writer = new PrintWriter(new File(tablePath));
@@ -35,7 +50,7 @@ public class Use {
                     }
                 }
                 System.out.println("using " + outputName);
-                Interpreter.tableIsChosen = true;
+                CommadTools.tableIsChosen = true;
             } else {
                 System.err.println(tableName + " not exists");
                 return false;
@@ -43,7 +58,7 @@ public class Use {
         } else {
             System.out.println("using " + oldTableName);
         }
-        Interpreter.usingTableName = Interpreter.currentTableObject.getName();
+        CommadTools.usingTableName = CommadTools.currentTable.getName();
         return true;
     }
 
@@ -67,8 +82,8 @@ public class Use {
             String tableName = new File(new File(datName).getParent()).getParent();
             ObjectStoreable valForMap = (ObjectStoreable)
                     new ObjectTableProvider().deserialize(new ObjectTable(tableName), value);
-            Interpreter.currentTableObject.storage.get().put(keyForMap, valForMap);
-            Interpreter.currentTableObject.commitStorage.put(keyForMap, valForMap);
+            CommadTools.currentTable.storage.get().put(keyForMap, valForMap);
+            CommadTools.currentTable.commitStorage.put(keyForMap, valForMap);
             counter = counter + offset + 3;
         }
         stream.close();
