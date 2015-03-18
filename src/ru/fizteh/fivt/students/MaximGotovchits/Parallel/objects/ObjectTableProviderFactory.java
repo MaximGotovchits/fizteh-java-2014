@@ -10,13 +10,8 @@ public class ObjectTableProviderFactory implements TableProviderFactory {
     @Override
     public TableProvider create(String dir) throws IllegalArgumentException {
         dirName = dir;
-        try {
-            if (dir == null || dir.length() > LONGEST_NAME) {
-                throw new IllegalArgumentException();
-            }
-        } catch (IllegalArgumentException s) {
-            System.err.println(s);
-            return null;
+        if (dir == null || dir.length() > LONGEST_NAME) {
+            throw new IllegalArgumentException();
         }
         return new ObjectTableProvider(dir);
     }

@@ -16,17 +16,17 @@ private final Charset coding = StandardCharsets.UTF_8;
 
     @Override
     public boolean execute(String[] cmd) throws Exception {
-        for (Map.Entry<String, ObjectStoreable> entry : CommadTools.currentTable.commitStorage.entrySet()) {
+        for (Map.Entry<String, ObjectStoreable> entry : CommandTools.currentTable.commitStorage.entrySet()) {
             int hashCode = entry.getKey().hashCode();
-            Integer nDirectory = hashCode % CommadTools.DIR_NUM;
-            Integer nFile = hashCode / CommadTools.DIR_NUM % CommadTools.FILE_NUM;
-            Path fileName = Paths.get(CommadTools.DATA_BASE_NAME, CommadTools.currentTable.getName(), nDirectory
-                    + CommadTools.DIR_EXT);
+            Integer nDirectory = hashCode % CommandTools.DIR_NUM;
+            Integer nFile = hashCode / CommandTools.DIR_NUM % CommandTools.FILE_NUM;
+            Path fileName = Paths.get(CommandTools.DATA_BASE_NAME, CommandTools.currentTable.getName(), nDirectory
+                    + CommandTools.DIR_EXT);
             File file = new File(fileName.toString());
             if (!file.exists()) {
                 file.mkdir();
             }
-            fileName = Paths.get(fileName.toString(), nFile + CommadTools.FILE_EXT);
+            fileName = Paths.get(fileName.toString(), nFile + CommandTools.FILE_EXT);
             file = new File(fileName.toString());
             if (!file.exists()) {
                 file.createNewFile();

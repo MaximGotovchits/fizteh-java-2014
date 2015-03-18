@@ -8,8 +8,8 @@ public class Get extends Command {
     public boolean execute(String[] cmd) {
         if (cmd.length == 2) {
             try {
-                if (CommadTools.tableIsChosen) {
-                    ObjectStoreable temp = (ObjectStoreable) CommadTools.currentTable.get(cmd[1]);
+                if (CommandTools.tableIsChosen) {
+                    ObjectStoreable temp = (ObjectStoreable) CommandTools.currentTable.get(cmd[1]);
                     if (temp == null) {
                         System.err.println("not found");
                     } else {
@@ -17,7 +17,7 @@ public class Get extends Command {
                         System.out.println(temp.serialisedValue);
                     }
                 } else {
-                    CommadTools.informToChooseTable();
+                    CommandTools.informToChooseTable();
                 }
             } catch (Exception e) {
                 System.out.println(e);

@@ -54,8 +54,6 @@ public class Interpreter {
                 new Exit().execute(exit);
             }
         }
-        correctCmdName = false;
+        //correctCmdName = false;
     }
-
-    //Interpreter(cmd, fromCmdLine);
 }

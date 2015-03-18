@@ -1,11 +1,14 @@
 package ru.fizteh.fivt.students.MaximGotovchits.Parallel.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.*;
 import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectStoreable;
 import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTable;
 import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTableProvider;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,49 +38,50 @@ public class ObjectTableProviderTest extends ObjectTableProvider {
         deserializedValue.typeKeeper = columnTypes;
         deserializedValue.serialisedValue = "[100500, 10000000, 123.456, 12.45, 100, true, \"ValueToTest\"]";
     }
+
     @Test
     public void createAndGetTableTest() throws IOException {
         name = "TestTable";
         assertEquals(null, createTable(name, columnTypes));
         assertEquals(testTable, getTable(name));
     }
-   // @test
-   // public void deserializeTest() throws ParseException, IOException {
-   //     assertEquals(deserializedValue, (ObjectStoreable) deserialize(table, valueToDeserialize));
-   // }
-    /*@test(expected = IllegalArgumentException.class) // Это была попытка сделать тест на исключения.
-        //В следующей задаче я постараюсь это сделать. Просто нужно изменять кучу кода.
-    public void createNullTableTest() throws IOException {
-        createTable(null, columnTypes);
-    }*/
-    /*@test
+
+    @Test
+    public void deserializeTest() throws IOException {
+        try {
+            assertEquals(deserializedValue, (ObjectStoreable) deserialize(testTable,
+                    deserializedValue.serialisedValue));
+        } catch (ParseException e) {
+            assertTrue(false);
+        }
+    }
+
+    @Test
+    public void deserializeExceptionTest() throws IOException {
+        try {
+            assertEquals(deserializedValue, deserialize(testTable,
+                    "we are waiting for exception here >:["));
+        } catch (ParseException e) {
+            assertTrue(true);
+        }
+    }
+
+    @Test
     public void serializeTest() {
-        assertEquals(valueToDeserialize, serialize(table, deserializedValue));
+        assertEquals(deserializedValue.serialisedValue, serialize(testTable, deserializedValue));
     }
-    @test
-    public void createForTest() {
-        ObjectStoreable tempStoreable = new ObjectStoreable();
-        tempStoreable.typeKeeper = table.typeKeeper;
-        assertEquals(tempStoreable, createFor(table));
-        tempStoreable.subValueList = deserializedValue.subValueList;
-        tempStoreable.serialisedValue = deserializedValue.serialisedValue;
-        ObjectStoreable qq = (ObjectStoreable) createFor(table, deserializedValue.subValueList);
-        assertEquals(tempStoreable, (ObjectStoreable) createFor(table, deserializedValue.subValueList));
+
+    @Test
+    public void createForFirstTest() {
+        assertEquals(deserializedValue, createFor(testTable, deserializedValue.subValueList));
     }
-    @test
-    public void getTableNamesTest() throws IOException { // Конечно же, стоит удостовериться,
+
+    @Test
+    public void getTableNameTest() throws IOException { // Конечно же, стоит удостовериться,
     // что в рабочей директории на момент тестирования нет таблиц.
-        List<String> toCompare = new LinkedList<String>();
-        toCompare.add(name);
-        for (Integer ind = 0; ind < 1000; ++ind) { // Generating tables.
-            toCompare.add(ind.toString());
-            createTable(ind.toString(), columnTypes);
-        }
-        assertTrue(toCompare.containsAll(getTableNames()));
-        for (Integer ind = 0; ind < 1000; ++ind) {
-            removeTable(ind.toString());
-        }
-    }*/
+        assertEquals("TestTable", testTable.getName());
+    }
+
     @After
     public void cleanUp() { // Поясню. Теста на removeTable нет. Если бы метод не работал, то было бы
         // сообщение "table_name exists". Его нет.

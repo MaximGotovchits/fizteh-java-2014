@@ -28,12 +28,6 @@ public class ObjectStoreable implements Storeable {
         serialisedValue += RIGHT_BRACE;
     }
 
-    /*public ObjectStoreable(Storeable value) {
-        subValueList = ((ObjectStoreable) value).subValueList;
-        serialisedValue = ((ObjectStoreable) value).serialisedValue;
-        typeKeeper = ((ObjectStoreable) value).typeKeeper;
-    }*/
-
     public ObjectStoreable(ObjectTable table) {
         typeKeeper = table.typeKeeper;
     }
@@ -66,22 +60,14 @@ public class ObjectStoreable implements Storeable {
 
     @Override
     public void setColumnAt(int columnIndex, Object value) throws ColumnFormatException, IndexOutOfBoundsException {
-        try {
-            if (columnIndex >= this.subValueList.size()) {
-                throw new IndexOutOfBoundsException();
-            }
-            List<Class<?>> toConvert = new LinkedList<>();
-            toConvert.add(value.getClass());
-            toConvert = convertToPrimitive(toConvert);
-            if (!typeKeeper.get(columnIndex).equals(toConvert.get(0))) {
-                throw new ColumnFormatException();
-            }
-        } catch (IndexOutOfBoundsException s) {
-            System.err.println(s);
-            return;
-        } catch (ColumnFormatException s) {
-            System.err.println(s);
-            return;
+        if (columnIndex >= this.subValueList.size()) {
+            throw new IndexOutOfBoundsException();
+        }
+        List<Class<?>> toConvert = new LinkedList<>();
+        toConvert.add(value.getClass());
+        toConvert = convertToPrimitive(toConvert);
+        if (!typeKeeper.get(columnIndex).equals(toConvert.get(0))) {
+            throw new ColumnFormatException();
         }
         this.subValueList.set(columnIndex, value);
         this.serialisedValue = "";
@@ -114,102 +100,66 @@ public class ObjectStoreable implements Storeable {
 
     @Override
     public Long getLongAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
-        try {
-            if (columnIndex >= this.typeKeeper.size()) {
-                throw new IndexOutOfBoundsException();
-            }
-            if (!typeKeeper.get(columnIndex).equals(long.class)) {
-                throw new ColumnFormatException();
-            }
-        } catch (IndexOutOfBoundsException s) {
-            System.err.println(s);
-        } catch (ColumnFormatException s) {
-            System.err.println(s);
+        if (columnIndex >= this.typeKeeper.size()) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (!typeKeeper.get(columnIndex).equals(long.class)) {
+            throw new ColumnFormatException();
         }
         return (Long) subValueList.get(columnIndex);
     }
 
     @Override
     public Byte getByteAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
-        try {
-            if (columnIndex >= this.typeKeeper.size()) {
-                throw new IndexOutOfBoundsException();
-            }
-            if (!typeKeeper.get(columnIndex).equals(byte.class)) {
-                throw new ColumnFormatException();
-            }
-        } catch (IndexOutOfBoundsException s) {
-            System.err.println(s);
-        } catch (ColumnFormatException s) {
-            System.err.println(s);
+        if (columnIndex >= this.typeKeeper.size()) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (!typeKeeper.get(columnIndex).equals(byte.class)) {
+            throw new ColumnFormatException();
         }
         return (Byte) subValueList.get(columnIndex);
     }
 
     @Override
     public Float getFloatAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
-        try {
-            if (columnIndex >= this.typeKeeper.size()) {
-                throw new IndexOutOfBoundsException();
-            }
-            if (!typeKeeper.get(columnIndex).equals(float.class)) {
-                throw new ColumnFormatException();
-            }
-        } catch (IndexOutOfBoundsException s) {
-            System.err.println(s);
-        } catch (ColumnFormatException s) {
-            System.err.println(s);
+        if (columnIndex >= this.typeKeeper.size()) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (!typeKeeper.get(columnIndex).equals(float.class)) {
+            throw new ColumnFormatException();
         }
         return (Float) subValueList.get(columnIndex);
     }
 
     @Override
     public Double getDoubleAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
-        try {
-            if (columnIndex >= this.typeKeeper.size()) {
-                throw new IndexOutOfBoundsException();
-            }
-            if (!typeKeeper.get(columnIndex).equals(double.class)) {
-                throw new ColumnFormatException();
-            }
-        } catch (IndexOutOfBoundsException s) {
-            System.err.println(s);
-        } catch (ColumnFormatException s) {
-            System.err.println(s);
+        if (columnIndex >= this.typeKeeper.size()) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (!typeKeeper.get(columnIndex).equals(double.class)) {
+            throw new ColumnFormatException();
         }
         return (Double) subValueList.get(columnIndex);
     }
 
     @Override
     public Boolean getBooleanAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
-        try {
-            if (columnIndex >= this.typeKeeper.size()) {
-                throw new IndexOutOfBoundsException();
-            }
-            if (!typeKeeper.get(columnIndex).equals(boolean.class)) {
-                throw new ColumnFormatException();
-            }
-        } catch (IndexOutOfBoundsException s) {
-            System.err.println(s);
-        } catch (ColumnFormatException s) {
-            System.err.println(s);
+        if (columnIndex >= this.typeKeeper.size()) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (!typeKeeper.get(columnIndex).equals(boolean.class)) {
+            throw new ColumnFormatException();
         }
         return (Boolean) subValueList.get(columnIndex);
     }
 
     @Override
     public String getStringAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
-        try {
-            if (columnIndex >= this.typeKeeper.size()) {
-                throw new IndexOutOfBoundsException();
-            }
-            if (!typeKeeper.get(columnIndex).equals(String.class)) {
-                throw new ColumnFormatException();
-            }
-        } catch (IndexOutOfBoundsException s) {
-            System.err.println(s);
-        } catch (ColumnFormatException s) {
-            System.err.println(s);
+        if (columnIndex >= this.typeKeeper.size()) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (!typeKeeper.get(columnIndex).equals(String.class)) {
+            throw new ColumnFormatException();
         }
         return subValueList.get(columnIndex).toString();
     }

@@ -7,7 +7,7 @@ public class Commit extends Command {
     @Override
     public boolean execute(String[] cmd) {
         if (cmd.length == 1) {
-            CommadTools.currentTable.commit();
+            CommandTools.currentTable.commit();
             return true;
         }
         return false;

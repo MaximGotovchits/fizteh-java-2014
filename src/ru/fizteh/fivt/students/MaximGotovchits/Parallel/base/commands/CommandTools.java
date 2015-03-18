@@ -2,7 +2,7 @@ package ru.fizteh.fivt.students.MaximGotovchits.Parallel.base.commands;
 
 import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTable;
 
-public class CommadTools {
+public class CommandTools {
     static final String INVITATIONAL_SYMBOL = "$ ";
     private static final String SPLIT_BY_COMMA = "\\s*;\\s*";
     protected static final String DATA_BASE_NAME = System.getProperty("fizteh.db.dir");

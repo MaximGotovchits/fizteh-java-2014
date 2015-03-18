@@ -9,6 +9,7 @@ public class Drop extends Command {
         if (cmd.length == 2) {
             try {
                 new ObjectTableProvider().removeTable(cmd[1]);
+                System.out.println("dropped");
             } catch (Exception e) {
                 System.err.println(e);
             }

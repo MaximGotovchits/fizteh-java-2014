@@ -5,7 +5,6 @@ import ru.fizteh.fivt.storage.structured.Storeable;
 import ru.fizteh.fivt.storage.structured.Table;
 import ru.fizteh.fivt.storage.structured.TableProvider;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,11 +13,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ObjectTableProvider implements TableProvider {
+    private static final String INCORRECT_SYMBOL = "^incorrect@";
     private static final String BRACES_KILLER = "^\\s*\\[\\s*|\\s*\\]\\s*$";
-    private static final String FILE_EXT = ".dat";
-    private static final Integer FILE_NUM = 16;
-    private static final String DIR_EXT = ".dir";
-    private static final Integer DIR_NUM = 16;
     private static final String JSON_REG_EX = "\\s*,\\s*(?=(?:(?:[^\"]*\"){2})*[^\"]*$)";
     private static String usingTableName;
     private static ObjectTable currentTableObject;
@@ -51,9 +47,10 @@ public class ObjectTableProvider implements TableProvider {
     public Table getTable(String name) throws IllegalArgumentException {
         checkException(name);
         ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-        if (new File(rootDirectory + File.separator + name).exists()) {
+        String tempPath = rootDirectory + File.separator + name;
+        if (new File(tempPath).exists()) {
             readWriteLock.readLock().lock();
-            ObjectTable tableToReturn = new ObjectTable(rootDirectory + File.separator + name);
+            ObjectTable tableToReturn = new ObjectTable(tempPath);
             readWriteLock.readLock().unlock();
             return tableToReturn;
         }
@@ -71,7 +68,7 @@ public class ObjectTableProvider implements TableProvider {
         File file = new File(rootDirectory + File.separator + name);
         File signatureFile = new File(rootDirectory + File.separator + name + File.separator + SIGNATURE_FILENAME);
         if (file.exists()) {
-            System.out.println(name + " exists");
+            return null;
         } else {
             file.mkdir();
             signatureFile.createNewFile();
@@ -87,7 +84,6 @@ public class ObjectTableProvider implements TableProvider {
             tempTypes = tempTypes.substring(0, tempTypes.length() - 1);
             writer.println(tempTypes);
             writer.close();
-            System.out.println("created");
         }
         readWriteLock.writeLock().unlock();
         writeSectionIsInUse = false;
@@ -111,7 +107,6 @@ public class ObjectTableProvider implements TableProvider {
             }
             recRem(tableName);
             toBeRemoved.delete();
-            System.out.println("dropped");
         } else {
             throw new IllegalStateException();
         }
@@ -134,8 +129,8 @@ public class ObjectTableProvider implements TableProvider {
         int index = 0;
         List<Class<?>> typeList = new LinkedList<>();
         for (String str : tempValue) {
-            Object val = getValue(str, usingTable, usingTable.typeKeeper.get(index));
-            if (val.equals("^incorrect$")) {
+            Object val = getValue(str/*, usingTable*/, usingTable.typeKeeper.get(index));
+            if (val.equals(INCORRECT_SYMBOL)) {
                 throw new ParseException(value, 0);
             }
             valueToReturn.subValueList.add(val);
@@ -167,9 +162,8 @@ public class ObjectTableProvider implements TableProvider {
 
     @Override
     public Storeable createFor(Table table, List<?> values) throws ColumnFormatException, IndexOutOfBoundsException {
-        int ind = 0;
         ObjectTable tempTable = new ObjectTable(table);
-        List<Class<?>> valTypes = new LinkedList<Class<?>>();
+        List<Class<?>> valTypes;
         valTypes = convertToPrimitive(values);
         if (values.size() != tempTable.getColumnsCount()) {
             throw new IndexOutOfBoundsException();
@@ -184,111 +178,82 @@ public class ObjectTableProvider implements TableProvider {
 
     @Override
     public List<String> getTableNames() {
-        List<String> list = new LinkedList<String>();
-        String currentFile = new String();
-        int recordsAmount = 0;
+        List<String> list = new LinkedList<>();
         File file = new File(rootDirectory);
         for (File sub : file.listFiles()) {
             if ((!sub.isHidden()) && sub.isDirectory()) {
-                recordsAmount = 0;
-                for (Integer i = 0; i < DIR_NUM; ++i) {
-                    currentFile = rootDirectory + File.separator + sub.getName() + File.separator
-                            + i + DIR_EXT;
-                    File file1 = new File(currentFile);
-                    if (file1.exists()) {
-                        for (Integer j = 0; j < FILE_NUM; ++j) {
-                            currentFile = rootDirectory + File.separator + sub.getName() + File.separator
-                                    + i + DIR_EXT + File.separator + j + FILE_EXT;
-                            file1 = new File(currentFile);
-                            try {
-                                if (file1.exists()) {
-                                    DataInputStream stream = new DataInputStream(new FileInputStream(currentFile));
-                                    byte[] data = new byte[(int) file1.length()];
-                                    stream.read(data);
-                                    String temp = new String(data, StandardCharsets.UTF_8);
-                                    recordsAmount += (temp.length() - temp.replaceAll(" ", "").length()) / 4;
-                                }
-                            } catch (FileNotFoundException e) {
-                                return null;
-                            } catch (IOException e) {
-                                return null;
-                            }
-                        }
-                    }
-                }
-                currentFile = new File(new File(new File(currentFile).getParent()).getParent()).getName();
                 list.add(sub.getName());
-                if (sub.getName().equals(usingTableName)) {
-                    System.out.println(sub.getName() + " "
-                            + (recordsAmount + currentTableObject.storage.get().size()));
-                } else {
-                    System.out.println(sub.getName() + " " + recordsAmount);
-                }
             }
         }
         return list;
     }
 
-    private Object getValue(String str, ObjectTable usingTable, Class<?> expectedType) throws NumberFormatException {
-        for (Class<?> type : usingTable.typeKeeper) {
-            if (expectedType.equals(int.class)) {
-                if (str.equals("null")) {
-                    return null;
-                }
-                Integer toReturn = Integer.parseInt(str);
-                return toReturn;
+    private Object getValue(String str, Class<?> expectedType)
+            throws NumberFormatException {
+        if (expectedType.equals(int.class)) {
+            if (isNull(str)) {
+                return null;
             }
-            if (expectedType.equals(long.class)) {
-                if (str.equals("null")) {
-                    return null;
-                }
-                Long toReturn = Long.parseLong(str);
-                return toReturn;
+            Integer toReturn = Integer.parseInt(str);
+            return toReturn;
+        }
+        if (expectedType.equals(long.class)) {
+            if (isNull(str)) {
+                return null;
             }
-            if (expectedType.equals(boolean.class)) {
-                if (str.equals("null")) {
-                    return null;
-                }
-                Boolean toReturn = Boolean.parseBoolean(str);
-                return toReturn;
+            Long toReturn = Long.parseLong(str);
+            return toReturn;
+        }
+        if (expectedType.equals(boolean.class)) {
+            if (isNull(str)) {
+                return null;
             }
-            if (expectedType.equals(String.class)) {
-                if (str.equals("null")) {
-                    return null;
-                }
-                String[] tmp = str.split("");
-                if (tmp[0].equals("\"") && tmp[tmp.length - 1].equals("\"")) {
-                    return str;
-                } else {
-                    throw new NumberFormatException();
-                }
+            Boolean toReturn = Boolean.parseBoolean(str);
+            return toReturn;
+        }
+        if (expectedType.equals(String.class)) {
+            if (isNull(str)) {
+                return null;
             }
-            if (expectedType.equals(byte.class)) {
-                if (str.equals("null")) {
-                    return null;
-                }
-                Byte toReturn = Byte.parseByte(str);
-                return toReturn;
-            }
-            if (expectedType.equals(double.class)) {
-                if (str.equals("null")) {
-                    return null;
-                }
-                Double toReturn = Double.parseDouble(str);
-                return toReturn;
-            }
-            if (expectedType.equals(float.class)) {
-                if (str.equals("null")) {
-                    return null;
-                }
-                Float toReturn = Float.parseFloat(str);
-                return toReturn;
+            String[] tmp = str.split("");
+            if (tmp[0].equals("\"") && tmp[tmp.length - 1].equals("\"")) {
+                return str;
+            } else {
+                throw new NumberFormatException();
             }
         }
-        return "^incorrect@";
+        if (expectedType.equals(byte.class)) {
+            if (isNull(str)) {
+                return null;
+            }
+            Byte toReturn = Byte.parseByte(str);
+            return toReturn;
+        }
+        if (expectedType.equals(double.class)) {
+            if (isNull(str)) {
+                return null;
+            }
+            Double toReturn = Double.parseDouble(str);
+            return toReturn;
+        }
+        if (expectedType.equals(float.class)) {
+            if (isNull(str)) {
+                return null;
+            }
+            Float toReturn = Float.parseFloat(str);
+            return toReturn;
+        }
+        return INCORRECT_SYMBOL;
     }
 
-    void recRem(String myFile) {
+    boolean isNull(String str) {
+        if (str.equals("null")) {
+            return true;
+        }
+        return false;
+    }
+
+    private void recRem(String myFile) {
         File file = new File(myFile);
         if (!file.exists()) {
             return;

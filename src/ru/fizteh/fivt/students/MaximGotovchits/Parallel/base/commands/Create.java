@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import static java.util.Arrays.copyOfRange;
+//import static java.util.Arrays.copyOfRange;
 
 public class Create extends Command {
     private static final String SPLIT_BY_RIGHT_BRACKET = "\\s*\\)\\s*";
@@ -25,16 +25,19 @@ public class Create extends Command {
         if (cmd.length > 2) {
             String createParameter = new String(); // (...) - type list.
             String tableName = cmd[1];
-            String[] qq = copyOfRange(cmd, 2, cmd.length);
             for (int ind = 2; ind < cmd.length; ++ind) {
                 createParameter += cmd[ind] + " ";
             }
             createParameter = createParameter.substring(0, createParameter.length() - 1);
-            List<Class<?>> typeList = new LinkedList<>();
+            List<Class<?>> typeList;
             try {
                 typeList = getTypeList(createParameter);
                 if (typeList != null) {
-                    new ObjectTableProvider().createTable(tableName, typeList);
+                    if (new ObjectTableProvider().createTable(tableName, typeList) != null) {
+                        System.out.println("created");
+                    } else {
+                        System.out.println(tableName + " exists");
+                    }
                 } else {
                     return false;
                 }

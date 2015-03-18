@@ -17,7 +17,7 @@ public class Use extends Command {
     @Override
     public boolean execute(String[] cmd) throws Exception {
         if (cmd.length == 2) {
-            useFunction(cmd[1], CommadTools.usingTableName);
+            useFunction(cmd[1], CommandTools.usingTableName);
             return true;
         }
         return false;
@@ -26,21 +26,21 @@ public class Use extends Command {
     public boolean useFunction(String tableName, String oldTableName) throws Exception {
         if (!tableName.equals(oldTableName)) {
             String outputName = tableName;
-            String tablePath = CommadTools.DATA_BASE_NAME + File.separator + tableName;
+            String tablePath = CommandTools.DATA_BASE_NAME + File.separator + tableName;
             File file = new File(tablePath);
             if (file.exists()) {
-                CommadTools.usingTableName = tableName;
-                if (CommadTools.tableIsChosen) {
+                CommandTools.usingTableName = tableName;
+                if (CommandTools.tableIsChosen) {
                     new FillTable().execute(null);
-                    CommadTools.currentTable.storage.get().clear();
-                    CommadTools.currentTable.commitStorage.clear();
+                    CommandTools.currentTable.storage.get().clear();
+                    CommandTools.currentTable.commitStorage.clear();
                 }
-                CommadTools.currentTable = new ObjectTable(CommadTools.DATA_BASE_NAME + File.separator
-                        + CommadTools.usingTableName);
-                for (Integer i = 0; i < CommadTools.DIR_NUM; ++i) {
-                    for (Integer j = 0; j < CommadTools.FILE_NUM; ++j) {
-                        tablePath = CommadTools.DATA_BASE_NAME + File.separator + tableName + File.separator
-                                + i + CommadTools.DIR_EXT + File.separator + j + CommadTools.FILE_EXT;
+                CommandTools.currentTable = new ObjectTable(CommandTools.DATA_BASE_NAME + File.separator
+                        + CommandTools.usingTableName);
+                for (Integer i = 0; i < CommandTools.DIR_NUM; ++i) {
+                    for (Integer j = 0; j < CommandTools.FILE_NUM; ++j) {
+                        tablePath = CommandTools.DATA_BASE_NAME + File.separator + tableName + File.separator
+                                + i + CommandTools.DIR_EXT + File.separator + j + CommandTools.FILE_EXT;
                         if (new File(tablePath).exists()) {
                             fillStorage(tablePath, file);
                             PrintWriter writer = new PrintWriter(new File(tablePath));
@@ -50,7 +50,7 @@ public class Use extends Command {
                     }
                 }
                 System.out.println("using " + outputName);
-                CommadTools.tableIsChosen = true;
+                CommandTools.tableIsChosen = true;
             } else {
                 System.err.println(tableName + " not exists");
                 return false;
@@ -58,7 +58,7 @@ public class Use extends Command {
         } else {
             System.out.println("using " + oldTableName);
         }
-        CommadTools.usingTableName = CommadTools.currentTable.getName();
+        CommandTools.usingTableName = CommandTools.currentTable.getName();
         return true;
     }
 
@@ -82,8 +82,8 @@ public class Use extends Command {
             String tableName = new File(new File(datName).getParent()).getParent();
             ObjectStoreable valForMap = (ObjectStoreable)
                     new ObjectTableProvider().deserialize(new ObjectTable(tableName), value);
-            CommadTools.currentTable.storage.get().put(keyForMap, valForMap);
-            CommadTools.currentTable.commitStorage.put(keyForMap, valForMap);
+            CommandTools.currentTable.storage.get().put(keyForMap, valForMap);
+            CommandTools.currentTable.commitStorage.put(keyForMap, valForMap);
             counter = counter + offset + 3;
         }
         stream.close();

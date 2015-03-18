@@ -103,7 +103,6 @@ public class ObjectTable implements Table {
         if (value == null) {
             return null;
         }
-        String serializedValue = value.serialisedValue;
         return value;
     }
 
@@ -124,7 +123,6 @@ public class ObjectTable implements Table {
             lastChanges.get().push(key);
             lastChanges.get().push("put");
             ++overwriteNum;
-            System.out.println(previousValue.serialisedValue);
         }
         return previousValue;
     }
@@ -152,19 +150,9 @@ public class ObjectTable implements Table {
     @Override
     public List<String> list() {
         LinkedList<String> list = new LinkedList<String>();
-        int size = 0;
         Set<String> k = storage.get().keySet();
         for (Object iter : k) {
             list.add(iter.toString());
-            if (size < storage.get().size() - 1) {
-                System.out.print(iter + ", ");
-            } else {
-                System.out.print(iter);
-            }
-            ++size;
-        }
-        if (size != 0) {
-            System.out.println();
         }
         return list;
     }

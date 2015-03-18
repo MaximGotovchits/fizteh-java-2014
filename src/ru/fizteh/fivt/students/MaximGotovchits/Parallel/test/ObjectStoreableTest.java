@@ -20,6 +20,7 @@ public class ObjectStoreableTest {
     public ObjectTable table;
     public String valueToDeserialize;
     public ObjectTable tempTable;
+
     @Before
     public void initialization() throws IOException {
         name = "TestTable";
@@ -42,6 +43,7 @@ public class ObjectStoreableTest {
         tempTable = (ObjectTable) new ObjectTableProvider().createTable(name, columnTypes);
         valueToDeserialize = "[100500, 10000000, 123.456, 12.45, 100, true, \"ValueToTest\"]";
     }
+
     @Test
     public void setColumnAtTest() {
         ObjectStoreable tempStoreable = new ObjectStoreable();
@@ -61,44 +63,47 @@ public class ObjectStoreableTest {
         deserializedValue.setColumnAt(6, "\"AnotherValue\"");
         assertEquals(tempStoreable, deserializedValue);
     }
+
     @Test
     public void getColumnAtTest() {
-        assertEquals(100500, deserializedValue.getColumnAt(0));
         assertEquals((long) 10000000, deserializedValue.getColumnAt(1));
-        assertEquals(123.456, deserializedValue.getColumnAt(2));
-        assertEquals((float) 12.45, deserializedValue.getColumnAt(3));
-        assertEquals((byte) 100, deserializedValue.getColumnAt(4));
-        assertEquals(true, deserializedValue.getColumnAt(5));
-        assertEquals("\"ValueToTest\"", deserializedValue.getColumnAt(6));
     }
+
     @Test
     public void getIntAtTest() {
         assertEquals((Integer) 100500, deserializedValue.getIntAt(0));
     }
+
     @Test
     public void getLongAtTest() {
         assertEquals((Long) Long.parseLong("10000000"), deserializedValue.getLongAt(1));
     }
+
     @Test
     public void getByteAtTest() {
         assertEquals((Byte) Byte.parseByte("100"), deserializedValue.getByteAt(4));
     }
+
     @Test
     public void getFloatAtTest() {
         assertEquals((Float) Float.parseFloat("12.45"), deserializedValue.getFloatAt(3));
     }
+
     @Test
     public void getDoubleAtTest() {
         assertEquals((Double) 123.456, deserializedValue.getDoubleAt(2));
     }
+
     @Test
     public void getBooleanAtTest() {
         assertEquals(true, deserializedValue.getBooleanAt(5));
     }
+
     @Test
     public void getStringAtTest() {
         assertEquals("\"ValueToTest\"", deserializedValue.getStringAt(6));
     }
+
     @After
     public void cleanUp() {
         new ObjectTableProvider().removeTable(name);
