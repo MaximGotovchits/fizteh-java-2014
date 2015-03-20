@@ -14,12 +14,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 
 public class ObjectStoreableTest {
-    public String name;
-    public List<Class<?>> columnTypes = new LinkedList<Class<?>>();
-    public ObjectStoreable deserializedValue = new ObjectStoreable();
+    private String name;
+    private List<Class<?>> columnTypes = new LinkedList<Class<?>>();
+    private ObjectStoreable deserializedValue = new ObjectStoreable();
     public ObjectTable table;
-    public String valueToDeserialize;
-    public ObjectTable tempTable;
+    private String valueToDeserialize;
+    private ObjectTable tempTable;
 
     @Before
     public void initialization() throws IOException {

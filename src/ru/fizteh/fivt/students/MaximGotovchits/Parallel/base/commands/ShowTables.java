@@ -1,11 +1,9 @@
 package ru.fizteh.fivt.students.MaximGotovchits.Parallel.base.commands;
 
 import ru.fizteh.fivt.students.MaximGotovchits.Parallel.interpreter.Command;
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTableProvider;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 public class ShowTables extends Command {
     @Override

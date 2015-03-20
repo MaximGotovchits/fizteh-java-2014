@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class ObjectTable implements Table {
-    static int overwriteNum = 0;
+    private static int overwriteNum = 0;
     private static final String DATA_BASE_NAME = System.getProperty("fizteh.db.dir");
     private static final String SIGNATURE_FILENAME = "signature.tsv";
 
@@ -31,7 +31,7 @@ public class ObjectTable implements Table {
     };
 
     public Map<String, ObjectStoreable> commitStorage = new HashMap<>();
-    public String tableName = new String();
+    private String tableName = new String();
     public List<Class<?>> typeKeeper = new LinkedList<Class<?>>();
 
     public ObjectTable() { }
@@ -201,7 +201,7 @@ public class ObjectTable implements Table {
         return objectToReturn;
     }
 
-    static String readFile(String path, Charset encoding) throws IOException {
+    private static String readFile(String path, Charset encoding) throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         String temp = new String(encoded, encoding);
         return temp.replaceAll("^\\s*|\\s*$", "");

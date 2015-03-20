@@ -13,10 +13,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ObjectTableProviderTest extends ObjectTableProvider {
-    public String name;
-    public List<Class<?>> columnTypes = new LinkedList<Class<?>>();
-    public ObjectStoreable deserializedValue = new ObjectStoreable();
-    public ObjectTable testTable;
+    private String name;
+    private List<Class<?>> columnTypes = new LinkedList<Class<?>>();
+    private ObjectStoreable deserializedValue = new ObjectStoreable();
+    private ObjectTable testTable;
     @Before
     public void initialization() throws IOException {
         name = "TestTable";
