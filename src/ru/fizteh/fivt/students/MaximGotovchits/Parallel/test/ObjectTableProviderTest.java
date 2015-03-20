@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ObjectTableProviderTest extends ObjectTableProvider {
     private String name;
-    private List<Class<?>> columnTypes = new LinkedList<Class<?>>();
+    private List<Class<?>> columnTypes = new LinkedList<>();
     private ObjectStoreable deserializedValue = new ObjectStoreable();
     private ObjectTable testTable;
     @Before
