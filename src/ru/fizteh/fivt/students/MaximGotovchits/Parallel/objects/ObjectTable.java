@@ -13,9 +13,6 @@ import java.util.*;
 
 public class ObjectTable implements Table {
     static int overwriteNum = 0;
-    private static final String JSON_REG_EX = "\\s*,\\s*(?=(?:(?:[^\"]*\"){2})*[^\"]*$)"; // Removes commas
-    // outside of "...".
-    public static String usingTableName = new String(); // OR public static String usingTableName;
     private static final String DATA_BASE_NAME = System.getProperty("fizteh.db.dir");
     private static final String SIGNATURE_FILENAME = "signature.tsv";
 
@@ -29,7 +26,7 @@ public class ObjectTable implements Table {
     public ThreadLocal<HashMap<String, ObjectStoreable>> storage = new ThreadLocal<HashMap<String, ObjectStoreable>>() {
         @Override
         protected HashMap<String, ObjectStoreable> initialValue() {
-            return new HashMap<String, ObjectStoreable>();
+            return new HashMap<>();
         }
     };
 
@@ -50,7 +47,7 @@ public class ObjectTable implements Table {
             name = DATA_BASE_NAME + File.separator + name;
         }
         this.tableName = new File(name).getName();
-        String content = new String();
+        String content;
         try {
             if (!new File(name + File.separator + SIGNATURE_FILENAME).isAbsolute()) {
                 name = DATA_BASE_NAME + File.separator + name;

@@ -15,15 +15,21 @@ public class Use extends Command {
     }
 
     @Override
-    public boolean execute(String[] cmd) throws Exception {
+    public boolean execute(String[] cmd) {
         if (cmd.length == 2) {
-            useFunction(cmd[1], CommandTools.usingTableName);
+            try {
+                useFunction(cmd[1], CommandTools.usingTableName);
+            } catch (IOException e) {
+                System.err.println(e);
+            } catch (ParseException e) {
+                System.err.println(e);
+            }
             return true;
         }
         return false;
     }
 
-    public boolean useFunction(String tableName, String oldTableName) throws Exception {
+    public boolean useFunction(String tableName, String oldTableName) throws IOException, ParseException {
         if (!tableName.equals(oldTableName)) {
             String outputName = tableName;
             String tablePath = CommandTools.DATA_BASE_NAME + File.separator + tableName;

@@ -6,7 +6,7 @@ import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTableProvi
 
 public class Put extends Command {
     public boolean execute(String[] cmd) {
-        if (cmd.length > 3) {
+        if (cmd.length > 2) {
             if (CommandTools.tableIsChosen) {
                 String putParameter = new String();
                 String key = cmd[1];
@@ -18,7 +18,6 @@ public class Put extends Command {
                     ObjectStoreable value = (ObjectStoreable) new ObjectTableProvider().
                             deserialize(CommandTools.currentTable, putParameter);
                     ObjectStoreable temp = (ObjectStoreable) CommandTools.currentTable.put(key, value);
-                    System.out.println(temp.serialisedValue);
                     if (temp == null) {
                         System.out.println("new");
                     } else {

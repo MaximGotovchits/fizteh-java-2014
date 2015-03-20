@@ -129,7 +129,7 @@ public class ObjectTableProvider implements TableProvider {
         int index = 0;
         List<Class<?>> typeList = new LinkedList<>();
         for (String str : tempValue) {
-            Object val = getValue(str/*, usingTable*/, usingTable.typeKeeper.get(index));
+            Object val = getValue(str, usingTable.typeKeeper.get(index));
             if (val.equals(INCORRECT_SYMBOL)) {
                 throw new ParseException(value, 0);
             }

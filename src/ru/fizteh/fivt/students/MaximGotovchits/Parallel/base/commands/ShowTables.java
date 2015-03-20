@@ -11,7 +11,6 @@ public class ShowTables extends Command {
     @Override
     public boolean execute(String[] cmd) {
         if (cmd.length == 2) {
-            List<String> list = new ObjectTableProvider().getTableNames();
             String currentFile;
             int recordsAmount;
             File file = new File(CommandTools.DATA_BASE_NAME);

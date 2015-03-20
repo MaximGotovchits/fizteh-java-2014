@@ -5,6 +5,7 @@ import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectStoreable;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -15,7 +16,7 @@ public class FillTable extends Command {
 private final Charset coding = StandardCharsets.UTF_8;
 
     @Override
-    public boolean execute(String[] cmd) throws Exception {
+    public boolean execute(String[] cmd) {
         for (Map.Entry<String, ObjectStoreable> entry : CommandTools.currentTable.commitStorage.entrySet()) {
             int hashCode = entry.getKey().hashCode();
             Integer nDirectory = hashCode % CommandTools.DIR_NUM;
@@ -28,17 +29,21 @@ private final Charset coding = StandardCharsets.UTF_8;
             }
             fileName = Paths.get(fileName.toString(), nFile + CommandTools.FILE_EXT);
             file = new File(fileName.toString());
-            if (!file.exists()) {
-                file.createNewFile();
+            try {
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                byte[] bytesKey = (" " + entry.getKey() + " ").getBytes(coding);
+                DataOutputStream stream = new DataOutputStream(new FileOutputStream(fileName.toString(), true));
+                stream.write(bytesKey.length);
+                stream.write(bytesKey);
+                byte[] bytesVal = ((" " + entry.getValue().serialisedValue + " ").getBytes(coding));
+                stream.write(bytesVal.length - 1);
+                stream.write(bytesVal);
+                stream.close();
+            } catch (IOException e) {
+                System.err.println(e);
             }
-            byte[] bytesKey = (" " + entry.getKey() + " ").getBytes(coding);
-            DataOutputStream stream = new DataOutputStream(new FileOutputStream(fileName.toString(), true));
-            stream.write((int) bytesKey.length);
-            stream.write(bytesKey);
-            byte[] bytesVal = ((" " + entry.getValue().serialisedValue + " ").getBytes(coding));
-            stream.write((int) bytesVal.length - 1);
-            stream.write(bytesVal);
-            stream.close();
         }
         return true;
     }
@@ -46,9 +51,5 @@ private final Charset coding = StandardCharsets.UTF_8;
     @Override
     public String getCmdName() {
         return "fill table";
-    }
-
-    private void streamWrite() {
-
     }
 }

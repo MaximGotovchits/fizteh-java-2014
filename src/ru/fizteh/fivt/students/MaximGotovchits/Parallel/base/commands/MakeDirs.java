@@ -6,7 +6,7 @@ import java.io.File;
 
 public class MakeDirs extends Command {
     @Override
-    public boolean execute(String[] cmd) throws Exception {
+    public boolean execute(String[] cmd) {
         File file = new File(CommandTools.DATA_BASE_NAME);
         if (!file.exists()) {
             file.mkdirs();

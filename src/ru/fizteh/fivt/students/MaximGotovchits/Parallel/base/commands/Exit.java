@@ -4,9 +4,11 @@ import ru.fizteh.fivt.students.MaximGotovchits.Parallel.interpreter.Command;
 
 public class Exit extends Command {
     @Override
-    public boolean execute(String[] cmd) throws Exception {
-        if (CommandTools.currentTable != null) {
+    public boolean execute(String[] cmd) {
+        if (CommandTools.currentTable != null && exitAndUseAvailable()) {
             new FillTable().execute(null);
+        } else {
+            return false;
         }
         System.exit(0);
         return true;

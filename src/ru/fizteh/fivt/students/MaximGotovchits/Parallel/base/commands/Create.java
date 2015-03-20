@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-//import static java.util.Arrays.copyOfRange;
-
 public class Create extends Command {
     private static final String SPLIT_BY_RIGHT_BRACKET = "\\s*\\)\\s*";
     private static final String SPLIT_BY_LEFT_BRACKET = "\\s*\\(\\s*";
@@ -21,7 +19,7 @@ public class Create extends Command {
     }
 
     @Override
-    public boolean execute(String[] cmd) throws Exception {
+    public boolean execute(String[] cmd) {
         if (cmd.length > 2) {
             String createParameter = new String(); // (...) - type list.
             String tableName = cmd[1];
@@ -43,13 +41,15 @@ public class Create extends Command {
                 }
             } catch (IOException e) {
                 System.err.println(e);
+            } catch (Exception e) {
+                System.err.println(e);
             }
             return true;
         }
         return false;
     }
 
-    public List<Class<?>> getTypeList(String line) throws Exception {
+    public List<Class<?>> getTypeList(String line) {
         ObjectTable temp = new ObjectTable();
         List<Class<?>> typeList = new LinkedList<Class<?>>();
         line = line.replaceAll(SPLIT_BY_RIGHT_BRACKET, "");
