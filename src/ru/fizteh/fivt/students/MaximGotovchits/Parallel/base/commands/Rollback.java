@@ -5,7 +5,7 @@ import ru.fizteh.fivt.students.MaximGotovchits.Parallel.interpreter.Command;
 public class Rollback extends Command {
     @Override
     public boolean execute(String[] cmd) {
-        if (cmd.length == 1) {
+        if (CommandTools.amountOfArgumentsIs(1, cmd)) {
             CommandTools.currentTable.rollback();
             return true;
         }

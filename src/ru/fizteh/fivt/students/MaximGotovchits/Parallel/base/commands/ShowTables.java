@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 public class ShowTables extends Command {
     @Override
     public boolean execute(String[] cmd) {
-        if (cmd.length == 2) {
+        if (CommandTools.amountOfArgumentsIs(2, cmd)) {
             String currentFile;
             int recordsAmount;
             File file = new File(CommandTools.DATA_BASE_NAME);

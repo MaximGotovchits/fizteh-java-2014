@@ -6,7 +6,7 @@ import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTableProvi
 public class Drop extends Command {
     @Override
     public boolean execute(String[] cmd) {
-        if (cmd.length == 2) {
+        if (CommandTools.amountOfArgumentsIs(2, cmd)) {
             try {
                 new ObjectTableProvider().removeTable(cmd[1]);
                 System.out.println("dropped");

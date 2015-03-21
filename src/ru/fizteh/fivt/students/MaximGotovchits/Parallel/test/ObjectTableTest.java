@@ -25,21 +25,11 @@ public class ObjectTableTest {
         name = "TestTable";
         columnTypes.add(int.class);
         columnTypes.add(long.class);
-        columnTypes.add(double.class);
-        columnTypes.add(float.class);
-        columnTypes.add(byte.class);
-        columnTypes.add(boolean.class);
-        columnTypes.add(String.class);
         testTable = (ObjectTable) new ObjectTableProvider().createTable(name, columnTypes);
         deserializedValue.subValueList.add(100500);
         deserializedValue.subValueList.add((long) 10000000);
-        deserializedValue.subValueList.add(123.456);
-        deserializedValue.subValueList.add((float) 12.45);
-        deserializedValue.subValueList.add((byte) 100);
-        deserializedValue.subValueList.add(true);
-        deserializedValue.subValueList.add("\"ValueToTest\"");
         deserializedValue.typeKeeper = columnTypes;
-        deserializedValue.serialisedValue = "[100500, 10000000, 123.456, 12.45, 100, true, \"ValueToTest\"]";
+        deserializedValue.serialisedValue = "[100500, 10000000]";
     }
 
     @Test
@@ -129,7 +119,7 @@ public class ObjectTableTest {
 
     @Test
     public void getColumnsCountTest() {
-        assertEquals(7, testTable.getColumnsCount());
+        assertEquals(2, testTable.getColumnsCount());
     }
 
     @Test
@@ -137,12 +127,7 @@ public class ObjectTableTest {
         new Use().useFunction(name, null);
         assertEquals(int.class, testTable.getColumnType(0));
         assertEquals(long.class, testTable.getColumnType(1));
-        assertEquals(double.class, testTable.getColumnType(2));
-        assertEquals(float.class, testTable.getColumnType(3));
-        assertEquals(byte.class, testTable.getColumnType(4));
-        assertEquals(boolean.class, testTable.getColumnType(5));
-        assertEquals(String.class, testTable.getColumnType(6));
-    }
+        }
 
     @After
     public void cleanUp() {

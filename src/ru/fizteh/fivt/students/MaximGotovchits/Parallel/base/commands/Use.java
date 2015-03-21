@@ -5,7 +5,6 @@ import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectStoreable;
 import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTable;
 import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTableProvider;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 
 public class Use extends Command {
@@ -16,7 +15,7 @@ public class Use extends Command {
 
     @Override
     public boolean execute(String[] cmd) {
-        if (cmd.length == 2) {
+        if (CommandTools.amountOfArgumentsIs(2, cmd)) {
             try {
                 useFunction(cmd[1], CommandTools.usingTableName);
             } catch (IOException e) {
@@ -80,10 +79,10 @@ public class Use extends Command {
         String aLL = new String(data);
         while (counter < file.length()) {
             offset = data[counter];
-            keyForMap = new String(data, counter + 2, offset - 2, StandardCharsets.UTF_8);
+            keyForMap = new String(data, counter + 2, offset - 2, CommandTools.UTF);
             counter = counter + offset + 1;
             offset = data[counter];
-            value = new String(data, counter + 2,  data.length - counter - 3, StandardCharsets.UTF_8);
+            value = new String(data, counter + 2,  data.length - counter - 3, CommandTools.UTF);
             value = value.replaceAll("^\\s*|\\s*$", "");
             String tableName = new File(new File(datName).getParent()).getParent();
             ObjectStoreable valForMap = (ObjectStoreable)

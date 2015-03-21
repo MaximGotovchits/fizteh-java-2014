@@ -22,10 +22,7 @@ public class Main { // Using JSON format.
             fromCmdLine = true;
             fillCommandSet(commandSet, currentTableObject, fromCmdLine);
             Interpreter interpreter = new Interpreter(commandSet);
-            String cmd = new String();
-            for (String arg : args) {
-                cmd = cmd.join(" ", cmd, arg);
-            }
+            String cmd = String.join(" ", args);
             cmd = cmd.replaceAll("\\s+", " ");
             System.out.println(cmd);
             interpreter.startUp(cmd, fromCmdLine);

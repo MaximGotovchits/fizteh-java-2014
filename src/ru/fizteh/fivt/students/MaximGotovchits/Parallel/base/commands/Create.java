@@ -5,6 +5,7 @@ import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTable;
 import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTableProvider;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,13 +21,10 @@ public class Create extends Command {
 
     @Override
     public boolean execute(String[] cmd) {
-        if (cmd.length > 2) {
-            String createParameter = new String(); // (...) - type list.
+        if (CommandTools.amountOfArgumentsIsMoreThan(2, cmd)) {
+            String createParameter; // (...) - type list.
             String tableName = cmd[1];
-            for (int ind = 2; ind < cmd.length; ++ind) {
-                createParameter += cmd[ind] + " ";
-            }
-            createParameter = createParameter.substring(0, createParameter.length() - 1);
+            createParameter = String.join(" ", Arrays.copyOfRange(cmd, 2, cmd.length));
             List<Class<?>> typeList;
             try {
                 typeList = getTypeList(createParameter);
@@ -51,7 +49,7 @@ public class Create extends Command {
 
     public List<Class<?>> getTypeList(String line) {
         ObjectTable temp = new ObjectTable();
-        List<Class<?>> typeList = new LinkedList<Class<?>>();
+        List<Class<?>> typeList = new LinkedList<>();
         line = line.replaceAll(SPLIT_BY_RIGHT_BRACKET, "");
         line = line.replaceAll(SPLIT_BY_LEFT_BRACKET, "");
         String[] tmp = line.split(SPLIT_BY_SPACE);

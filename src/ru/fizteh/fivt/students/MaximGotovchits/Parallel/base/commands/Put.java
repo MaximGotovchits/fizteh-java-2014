@@ -6,7 +6,7 @@ import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTableProvi
 
 public class Put extends Command {
     public boolean execute(String[] cmd) {
-        if (cmd.length > 2) {
+        if (CommandTools.amountOfArgumentsIsMoreThan(2, cmd)) {
             if (CommandTools.tableIsChosen) {
                 String putParameter = new String();
                 String key = cmd[1];

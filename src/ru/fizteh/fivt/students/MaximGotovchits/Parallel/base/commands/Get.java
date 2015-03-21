@@ -6,7 +6,7 @@ import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectStoreable;
 public class Get extends Command {
     @Override
     public boolean execute(String[] cmd) {
-        if (cmd.length == 2) {
+        if (CommandTools.amountOfArgumentsIs(2, cmd)) {
             try {
                 if (CommandTools.tableIsChosen) {
                     ObjectStoreable temp = (ObjectStoreable) CommandTools.currentTable.get(cmd[1]);

@@ -115,7 +115,7 @@ public class InteractiveModeTest {
                 + "rollback\nextremely_secret_word_for_test").getBytes());
         interpreter.scan = new Scanner(in);
         interpreter.startUp(null, false);
-        assertEquals("$ using " + TEST_TABLE_NAME + "\n$ new\n$ $ ", outContent.toString());
+        assertEquals("$ using " + TEST_TABLE_NAME + "\n$ overwrite\n$ $ ", outContent.toString());
     }
 
     @Test
@@ -124,7 +124,8 @@ public class InteractiveModeTest {
                 + "\nshow tables\nextremely_secret_word_for_test").getBytes());
         interpreter.scan = new Scanner(in);
         interpreter.startUp(null, false);
-        assertEquals("$ using " + TEST_TABLE_NAME + "\n$ " + TEST_TABLE_NAME + " 0\n$ ", outContent.toString());
+        assertEquals("$ using " + TEST_TABLE_NAME + "\n$ something 0\n" + TEST_TABLE_NAME
+                + " 0\n$ ", outContent.toString());
     }
 
     @Test

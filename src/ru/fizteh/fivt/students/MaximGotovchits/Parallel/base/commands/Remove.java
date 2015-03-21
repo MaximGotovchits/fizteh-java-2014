@@ -5,7 +5,7 @@ import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectStoreable;
 
 public class Remove extends Command {
     public boolean execute(String[] cmd) {
-        if (cmd.length == 2) {
+        if (CommandTools.amountOfArgumentsIs(2, cmd)) {
             if (CommandTools.tableIsChosen) {
                 try {
                     ObjectStoreable temp = (ObjectStoreable) CommandTools.currentTable.remove(cmd[1]);
