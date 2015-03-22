@@ -6,23 +6,30 @@ import ru.fizteh.fivt.storage.structured.Storeable;
 import ru.fizteh.fivt.storage.structured.Table;
 import ru.fizteh.fivt.storage.structured.TableProvider;
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ObjectTableProvider implements TableProvider {
+    private static final int DIR_NUM = 16;
+    private static final int FILE_NUM = 16;
+    private static final String DIR_EXT = ".dir";
+    private static final String FILE_EXT = ".dat";
     private static final String INCORRECT_SYMBOL = "^incorrect@";
     private static final String BRACES_KILLER = "^\\s*\\[\\s*|\\s*\\]\\s*$";
     private static final int LONGEST_NAME = 260;
     private static final String JSON_REG_EX = "\\s*,\\s*(?=(?:(?:[^\"]*\"){2})*[^\"]*$)";
-    public static String usingTableName;
-    public static ObjectTable currentTableObject;
-    static final String SIGNATURE_FILENAME = "signature.tsv";
+    private static String usingTableName;
+    private static ObjectTable currentTableObject;
+    private static final String SIGNATURE_FILENAME = "signature.tsv";
     private static Boolean tableIsChosen = false;
-    public static String dataBaseName = System.getProperty("fizteh.db.dir");
+    private static String dataBaseName = System.getProperty("fizteh.db.dir");
     private volatile boolean writeSectionIsInUse = false;
     private String rootDirectory = "";
     public ObjectTableProvider() {
@@ -36,6 +43,38 @@ public class ObjectTableProvider implements TableProvider {
 
     public int hashCode() {
         return Objects.hashCode(this.rootDirectory);
+    }
+
+    public ObjectTable getCurrentTableObject() {
+        return currentTableObject;
+    }
+
+    public String getDataBaseName() {
+        return dataBaseName;
+    }
+
+    public String getSugnatureFilename() {
+        return SIGNATURE_FILENAME;
+    }
+
+    public void setCurrentTableObject(ObjectTable toAssign) {
+        currentTableObject = toAssign;
+    }
+
+    public int getDirNum() {
+        return DIR_NUM;
+    }
+
+    public int getFileNum() {
+        return FILE_NUM;
+    }
+
+    public String getDirExt() {
+        return DIR_EXT;
+    }
+
+    public String getFileExt() {
+        return FILE_EXT;
     }
 
     @Override
@@ -120,7 +159,7 @@ public class ObjectTableProvider implements TableProvider {
         if (!splittedValue[0].equals("[") || !splittedValue[splittedValue.length - 1].equals("]")) {
             throw new ParseException(value, 0);
         }
-        valueToReturn.serialisedValue = value;
+        valueToReturn.setSerialisedValue(value);
         value = value.replaceAll(BRACES_KILLER, ""); // Removing [ and ].
         String[] tempValue = value.split(JSON_REG_EX); // Split by comma.
         if (usingTable.getColumnsCount() != tempValue.length) {
@@ -133,11 +172,11 @@ public class ObjectTableProvider implements TableProvider {
             if (val.equals(INCORRECT_SYMBOL)) {
                 throw new ParseException(value, 0);
             }
-            valueToReturn.subValueList.add(val);
+            valueToReturn.getSubValueList().add(val);
             typeList.add(val.getClass());
             ++index;
         }
-        valueToReturn.typeKeeper = usingTable.typeKeeper;
+        valueToReturn.setTypeKeeper(usingTable.typeKeeper);
         return valueToReturn;
     }
 
@@ -147,12 +186,12 @@ public class ObjectTableProvider implements TableProvider {
         ObjectTable tableObj = (ObjectTable) table;
         int index = 0;
         for (Class<?> type : tableObj.typeKeeper) {
-            if (!type.equals(valueToSerialize.typeKeeper.get(index))) {
+            if (!type.equals(valueToSerialize.getTypeKeeper().get(index))) {
                 throw new ColumnFormatException();
             }
             ++index;
         }
-        return valueToSerialize.serialisedValue;
+        return valueToSerialize.getSerialisedValue();
     }
 
     @Override
@@ -172,7 +211,7 @@ public class ObjectTableProvider implements TableProvider {
             throw new ColumnFormatException();
         }
         ObjectStoreable toReturn = new ObjectStoreable(values);
-        toReturn.typeKeeper = tempTable.typeKeeper;
+        toReturn.setTypeKeeper(tempTable.typeKeeper);
         return toReturn;
     }
 
@@ -305,6 +344,64 @@ public class ObjectTableProvider implements TableProvider {
             }
         }
         return toReturn;
+    }
+
+    public static void fillTable() {
+        for (Map.Entry<String, ObjectStoreable> entry : currentTableObject
+                .commitStorage.entrySet()) {
+            int hashCode = entry.getKey().hashCode();
+            Integer nDirectory = hashCode % DIR_NUM;
+            Integer nFile = hashCode / DIR_NUM % FILE_NUM;
+            Path fileName = Paths.get(CommandTools.DATA_BASE_NAME, currentTableObject.getName(),
+                    nDirectory + DIR_EXT);
+            File file = new File(fileName.toString());
+            if (!file.exists()) {
+                file.mkdir();
+            }
+            fileName = Paths.get(fileName.toString(), nFile + FILE_EXT);
+            file = new File(fileName.toString());
+            try {
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                byte[] bytesKey = (" " + entry.getKey() + " ").getBytes(CommandTools.UTF);
+                DataOutputStream stream = new DataOutputStream(new FileOutputStream(fileName.toString(), true));
+                stream.write(bytesKey.length);
+                stream.write(bytesKey);
+                byte[] bytesVal = ((" " + entry.getValue().getSerialisedValue() + " ").getBytes(CommandTools.UTF));
+                stream.write(bytesVal.length - 1);
+                stream.write(bytesVal);
+                stream.close();
+            } catch (IOException e) {
+                System.err.println(e);
+            }
+        }
+    }
+
+    public static void fillStorage(String datName, File file) throws IOException, ParseException {
+        DataInputStream stream = new DataInputStream(new FileInputStream(datName));
+        file = new File(datName);
+        byte[] data = new byte[(int) file.length()];
+        stream.read(data);
+        int counter = 0;
+        int offset;
+        String keyForMap;
+        String value ;
+        while (counter < file.length()) {
+            offset = data[counter];
+            keyForMap = new String(data, counter + 2, offset - 2, CommandTools.UTF);
+            counter = counter + offset + 1;
+            offset = data[counter];
+            value = new String(data, counter + 2,  data.length - counter - 3, CommandTools.UTF);
+            value = value.replaceAll("^\\s*|\\s*$", "");
+            String tableName = new File(new File(datName).getParent()).getParent();
+            ObjectStoreable valForMap = (ObjectStoreable)
+                    new ObjectTableProvider().deserialize(new ObjectTable(tableName), value);
+            currentTableObject.storage.get().put(keyForMap, valForMap);
+            currentTableObject.commitStorage.put(keyForMap, valForMap);
+            counter = counter + offset + 3;
+        }
+        stream.close();
     }
 }
 

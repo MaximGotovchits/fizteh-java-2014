@@ -31,10 +31,8 @@ public class BatchModeTest {
         commandSet.add(new Create());
         commandSet.add(new Drop());
         commandSet.add(new Exit());
-        commandSet.add(new FillTable());
         commandSet.add(new Get());
         commandSet.add(new List());
-        commandSet.add(new MakeDirs());
         commandSet.add(new Put());
         commandSet.add(new Remove());
         commandSet.add(new Rollback());

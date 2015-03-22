@@ -5,8 +5,8 @@ import ru.fizteh.fivt.students.MaximGotovchits.Parallel.interpreter.Command;
 public class Exit extends Command {
     @Override
     public boolean execute(String[] cmd) {
-        if (CommandTools.currentTable != null && exitAndUseAvailable()) {
-            new FillTable().execute(null);
+        if (CommandTools.currentTableProvider.getCurrentTableObject() != null && exitAndUseAvailable()) {
+            CommandTools.currentTableProvider.fillTable();
         } else {
             return false;
         }
@@ -15,9 +15,9 @@ public class Exit extends Command {
     }
 
     public boolean exitAndUseAvailable() {
-        if (CommandTools.currentTable != null) {
-            int uncommitedChanges = CommandTools.currentTable.storage.get().size()
-                    - CommandTools.currentTable.commitStorage.size();
+        if (CommandTools.currentTableProvider.getCurrentTableObject() != null) {
+            int uncommitedChanges = CommandTools.currentTableProvider.getCurrentTableObject().storage.get().size()
+                    - CommandTools.currentTableProvider.getCurrentTableObject().commitStorage.size();
             if (uncommitedChanges == 0 || !CommandTools.tableIsChosen) {
                 return true;
             }

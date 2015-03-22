@@ -31,15 +31,15 @@ public class ObjectStoreableTest {
         columnTypes.add(byte.class);
         columnTypes.add(boolean.class);
         columnTypes.add(String.class);
-        deserializedValue.subValueList.add(100500);
-        deserializedValue.subValueList.add((long) 10000000);
-        deserializedValue.subValueList.add(123.456);
-        deserializedValue.subValueList.add((float) 12.45);
-        deserializedValue.subValueList.add((byte) 100);
-        deserializedValue.subValueList.add(true);
-        deserializedValue.subValueList.add("\"ValueToTest\"");
-        deserializedValue.typeKeeper = columnTypes;
-        deserializedValue.serialisedValue = "[100500, 10000000, 123.456, 12.45, 100, true, \"ValueToTest\"]";
+        deserializedValue.getSubValueList().add(100500);
+        deserializedValue.getSubValueList().add((long) 10000000);
+        deserializedValue.getSubValueList().add(123.456);
+        deserializedValue.getSubValueList().add((float) 12.45);
+        deserializedValue.getSubValueList().add((byte) 100);
+        deserializedValue.getSubValueList().add(true);
+        deserializedValue.getSubValueList().add("\"ValueToTest\"");
+        deserializedValue.setTypeKeeper(columnTypes);
+        deserializedValue.setSerialisedValue("[100500, 10000000, 123.456, 12.45, 100, true, \"ValueToTest\"]");
         tempTable = (ObjectTable) new ObjectTableProvider().createTable(name, columnTypes);
         valueToDeserialize = "[100500, 10000000, 123.456, 12.45, 100, true, \"ValueToTest\"]";
     }
@@ -47,18 +47,18 @@ public class ObjectStoreableTest {
     @Test
     public void setColumnAtTest() {
         ObjectStoreable tempStoreable = new ObjectStoreable();
-        tempStoreable.subValueList.add(100500);
-        tempStoreable.subValueList.add((long) 10000000);
-        tempStoreable.subValueList.add(123.456);
-        tempStoreable.subValueList.add((float) 12.45);
-        tempStoreable.subValueList.add((byte) 100);
-        tempStoreable.subValueList.add(true);
-        tempStoreable.subValueList.add("\"ValueToTest\"");
-        tempStoreable.typeKeeper = columnTypes;
-        tempStoreable.serialisedValue = "[100500, 10000000, 123.456, 12.45, 100, true, \"ValueToTest\"]";
+        tempStoreable.getSubValueList().add(100500);
+        tempStoreable.getSubValueList().add((long) 10000000);
+        tempStoreable.getSubValueList().add(123.456);
+        tempStoreable.getSubValueList().add((float) 12.45);
+        tempStoreable.getSubValueList().add((byte) 100);
+        tempStoreable.getSubValueList().add(true);
+        tempStoreable.getSubValueList().add("\"ValueToTest\"");
+        tempStoreable.setTypeKeeper(columnTypes);
+        tempStoreable.setSerialisedValue("[100500, 10000000, 123.456, 12.45, 100, true, \"ValueToTest\"]");
         assertEquals(tempStoreable, deserializedValue);
-        tempStoreable.subValueList.set(6, "\"AnotherValue\"");
-        tempStoreable.serialisedValue = "[100500, 10000000, 123.456, 12.45, 100, true, \"AnotherValue\"]";
+        tempStoreable.getSubValueList().set(6, "\"AnotherValue\"");
+        tempStoreable.setSerialisedValue("[100500, 10000000, 123.456, 12.45, 100, true, \"AnotherValue\"]");
         assertNotSame(tempStoreable, deserializedValue);
         deserializedValue.setColumnAt(6, "\"AnotherValue\"");
         assertEquals(tempStoreable, deserializedValue);

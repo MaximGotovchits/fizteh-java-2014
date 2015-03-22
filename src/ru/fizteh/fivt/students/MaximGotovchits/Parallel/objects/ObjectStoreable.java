@@ -11,12 +11,32 @@ public class ObjectStoreable implements Storeable {
     private static final String LEFT_BRACE = "[";
     private static final String RIGHT_BRACE = "]";
     private static final String VALUE_SEPARATOR = ", ";
-    public List<Object> subValueList = new LinkedList<>();
+    private List<Object> subValueList = new LinkedList<>();
     private static ObjectTable currentTableObject;
-    public String serialisedValue;
-    public List<Class<?>> typeKeeper = new LinkedList<>();
+    private String serialisedValue;
+    private List<Class<?>> typeKeeper = new LinkedList<>();
 
     public ObjectStoreable() {}
+
+    public List<Object> getSubValueList() {
+        return subValueList;
+    }
+
+    public void setSerialisedValue(String toAssign) {
+        serialisedValue = toAssign;
+    }
+
+    public String getSerialisedValue() {
+        return serialisedValue;
+    }
+
+    public void setTypeKeeper(List<Class<?>> toAssign) {
+        typeKeeper = toAssign;
+    }
+
+    public List<Class<?>> getTypeKeeper() {
+        return typeKeeper;
+    }
 
     public ObjectStoreable(List<?> values) {
         serialisedValue = LEFT_BRACE;
@@ -24,8 +44,7 @@ public class ObjectStoreable implements Storeable {
             subValueList.add(val);
             serialisedValue += val + VALUE_SEPARATOR;
         }
-        serialisedValue = serialisedValue.substring(0, serialisedValue.length() - 2);
-        serialisedValue += RIGHT_BRACE;
+        completeSerialisedValue();
     }
 
     public ObjectStoreable(ObjectTable table) {
@@ -72,8 +91,7 @@ public class ObjectStoreable implements Storeable {
         for (Object val : this.subValueList) {
             serialisedValue += val + VALUE_SEPARATOR;
         }
-        serialisedValue = serialisedValue.substring(0, serialisedValue.length() - 2);
-        serialisedValue += RIGHT_BRACE;
+        completeSerialisedValue();
     }
 
     @Override
@@ -86,67 +104,37 @@ public class ObjectStoreable implements Storeable {
 
     @Override
     public Integer getIntAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
-        if (columnIndex >= subValueList.size()) {
-            throw new IndexOutOfBoundsException();
-        }
-        if (!this.typeKeeper.get(columnIndex).equals(int.class)) {
-            throw new ColumnFormatException();
-        }
+        checkGetSomethingAtException(columnIndex);
         return (Integer) subValueList.get(columnIndex);
     }
 
     @Override
     public Long getLongAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
-        if (columnIndex >= this.typeKeeper.size()) {
-            throw new IndexOutOfBoundsException();
-        }
-        if (!typeKeeper.get(columnIndex).equals(long.class)) {
-            throw new ColumnFormatException();
-        }
+        checkGetSomethingAtException(columnIndex);
         return (Long) subValueList.get(columnIndex);
     }
 
     @Override
     public Byte getByteAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
-        if (columnIndex >= this.typeKeeper.size()) {
-            throw new IndexOutOfBoundsException();
-        }
-        if (!typeKeeper.get(columnIndex).equals(byte.class)) {
-            throw new ColumnFormatException();
-        }
+        checkGetSomethingAtException(columnIndex);
         return (Byte) subValueList.get(columnIndex);
     }
 
     @Override
     public Float getFloatAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
-        if (columnIndex >= this.typeKeeper.size()) {
-            throw new IndexOutOfBoundsException();
-        }
-        if (!typeKeeper.get(columnIndex).equals(float.class)) {
-            throw new ColumnFormatException();
-        }
+        checkGetSomethingAtException(columnIndex);
         return (Float) subValueList.get(columnIndex);
     }
 
     @Override
     public Double getDoubleAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
-        if (columnIndex >= this.typeKeeper.size()) {
-            throw new IndexOutOfBoundsException();
-        }
-        if (!typeKeeper.get(columnIndex).equals(double.class)) {
-            throw new ColumnFormatException();
-        }
+        checkGetSomethingAtException(columnIndex);
         return (Double) subValueList.get(columnIndex);
     }
 
     @Override
     public Boolean getBooleanAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
-        if (columnIndex >= this.typeKeeper.size()) {
-            throw new IndexOutOfBoundsException();
-        }
-        if (!typeKeeper.get(columnIndex).equals(boolean.class)) {
-            throw new ColumnFormatException();
-        }
+        checkGetSomethingAtException(columnIndex);
         return (Boolean) subValueList.get(columnIndex);
     }
 
@@ -159,6 +147,15 @@ public class ObjectStoreable implements Storeable {
             throw new ColumnFormatException();
         }
         return subValueList.get(columnIndex).toString();
+    }
+
+    private void checkGetSomethingAtException(int columnIndex) {
+        if (columnIndex >= this.typeKeeper.size()) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (!typeKeeper.get(columnIndex).equals(boolean.class)) {
+            throw new ColumnFormatException();
+        }
     }
 
     private List<Class<?>> convertToPrimitive(List<Class<?>> list) {
@@ -194,6 +191,11 @@ public class ObjectStoreable implements Storeable {
             }
         }
         return toReturn;
+    }
+
+    private void completeSerialisedValue() {
+        serialisedValue = serialisedValue.substring(0, serialisedValue.length() - 2);
+        serialisedValue += RIGHT_BRACE;
     }
 }
 
@@ -346,5 +348,4 @@ public class ObjectStoreable implements Storeable {
         return toReturn;
     }
 }
- 
 */

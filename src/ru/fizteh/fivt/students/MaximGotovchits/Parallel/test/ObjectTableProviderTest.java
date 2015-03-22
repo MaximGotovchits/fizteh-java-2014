@@ -28,15 +28,15 @@ public class ObjectTableProviderTest extends ObjectTableProvider {
         columnTypes.add(boolean.class);
         columnTypes.add(String.class);
         testTable = (ObjectTable) new ObjectTableProvider().createTable(name, columnTypes);
-        deserializedValue.subValueList.add(100500);
-        deserializedValue.subValueList.add((long) 10000000);
-        deserializedValue.subValueList.add(123.456);
-        deserializedValue.subValueList.add((float) 12.45);
-        deserializedValue.subValueList.add((byte) 100);
-        deserializedValue.subValueList.add(true);
-        deserializedValue.subValueList.add("\"ValueToTest\"");
-        deserializedValue.typeKeeper = columnTypes;
-        deserializedValue.serialisedValue = "[100500, 10000000, 123.456, 12.45, 100, true, \"ValueToTest\"]";
+        deserializedValue.getSubValueList().add(100500);
+        deserializedValue.getSubValueList().add((long) 10000000);
+        deserializedValue.getSubValueList().add(123.456);
+        deserializedValue.getSubValueList().add((float) 12.45);
+        deserializedValue.getSubValueList().add((byte) 100);
+        deserializedValue.getSubValueList().add(true);
+        deserializedValue.getSubValueList().add("\"ValueToTest\"");
+        deserializedValue.setTypeKeeper(columnTypes);
+        deserializedValue.setSerialisedValue("[100500, 10000000, 123.456, 12.45, 100, true, \"ValueToTest\"]");
     }
 
     @Test
@@ -49,8 +49,8 @@ public class ObjectTableProviderTest extends ObjectTableProvider {
     @Test
     public void deserializeTest() throws IOException {
         try {
-            assertEquals(deserializedValue, (ObjectStoreable) deserialize(testTable,
-                    deserializedValue.serialisedValue));
+            assertEquals(deserializedValue, deserialize(testTable,
+                    deserializedValue.getSerialisedValue()));
         } catch (ParseException e) {
             assertTrue(false);
         }
@@ -68,12 +68,12 @@ public class ObjectTableProviderTest extends ObjectTableProvider {
 
     @Test
     public void serializeTest() {
-        assertEquals(deserializedValue.serialisedValue, serialize(testTable, deserializedValue));
+        assertEquals(deserializedValue.getSerialisedValue(), serialize(testTable, deserializedValue));
     }
 
     @Test
     public void createForFirstTest() {
-        assertEquals(deserializedValue, createFor(testTable, deserializedValue.subValueList));
+        assertEquals(deserializedValue, createFor(testTable, deserializedValue.getSubValueList()));
     }
 
     @Test

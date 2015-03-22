@@ -9,12 +9,13 @@ public class Get extends Command {
         if (CommandTools.amountOfArgumentsIs(2, cmd)) {
             try {
                 if (CommandTools.tableIsChosen) {
-                    ObjectStoreable temp = (ObjectStoreable) CommandTools.currentTable.get(cmd[1]);
+                    ObjectStoreable temp = (ObjectStoreable) CommandTools.currentTableProvider.getCurrentTableObject()
+                            .get(cmd[1]);
                     if (temp == null) {
                         System.err.println("not found");
                     } else {
                         System.out.println("found");
-                        System.out.println(temp.serialisedValue);
+                        System.out.println(temp.getSerialisedValue());
                     }
                 } else {
                     CommandTools.informToChooseTable();

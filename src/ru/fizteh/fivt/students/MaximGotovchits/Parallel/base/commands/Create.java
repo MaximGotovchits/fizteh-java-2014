@@ -39,8 +39,6 @@ public class Create extends Command {
                 }
             } catch (IOException e) {
                 System.err.println(e);
-            } catch (Exception e) {
-                System.err.println(e);
             }
             return true;
         }

@@ -276,14 +276,15 @@ public class ObjectTable implements Table {
     }
 
     public ObjectTable(String name) {
+        ObjectTableProvider tmp = new ObjectTableProvider();
         if (!new File(name).isAbsolute()) {
-            name = ObjectTableProvider.dataBaseName + File.separator + name;
+            name = new ObjectTableProvider().getDataBaseName() + File.separator + name;
         }
         this.tableName = new File(name).getName();
-        if (!new File(name + File.separator + ObjectTableProvider.SIGNATURE_FILENAME).isAbsolute()) {
-            name = ObjectTableProvider.dataBaseName + File.separator + name;
+        if (!new File(name + File.separator + tmp.getSugnatureFilename()).isAbsolute()) {
+            name = tmp.getDataBaseName() + File.separator + name;
         }
-        String content = readFile(name + File.separator + ObjectTableProvider.SIGNATURE_FILENAME,
+        String content = readFile(name + File.separator + tmp.getSugnatureFilename(),
                 Charset.defaultCharset());
         content = content.replaceAll("\\s+", " ");
         String[] types = content.split(" ");
@@ -334,7 +335,7 @@ public class ObjectTable implements Table {
         if (key == null || value == null) {
             throw new IllegalArgumentException();
         }
-        if (!this.typeKeeper.equals(((ObjectStoreable) value).typeKeeper)) {
+        if (!this.typeKeeper.equals(((ObjectStoreable) value).getTypeKeeper())) {
             throw new ColumnFormatException();
         }
         ObjectStoreable previousValue = storage.get().put(key, (ObjectStoreable) value);
@@ -443,8 +444,11 @@ public class ObjectTable implements Table {
         if (typeName.equals("boolean")) {
             return boolean.class;
         }
-        if (typeName.equals("String")) {
+        if (typeName.equals("String") || typeName.equals("string")) {
             return String.class;
+        }
+        if (typeName.equals("char")) {
+            return char.class;
         }
         return null;
     }

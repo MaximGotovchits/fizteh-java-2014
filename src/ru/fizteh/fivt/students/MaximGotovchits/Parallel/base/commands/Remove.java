@@ -8,7 +8,8 @@ public class Remove extends Command {
         if (CommandTools.amountOfArgumentsIs(2, cmd)) {
             if (CommandTools.tableIsChosen) {
                 try {
-                    ObjectStoreable temp = (ObjectStoreable) CommandTools.currentTable.remove(cmd[1]);
+                    ObjectStoreable temp = (ObjectStoreable) CommandTools.currentTableProvider.getCurrentTableObject()
+                            .remove(cmd[1]);
                     if (temp == null) {
                         System.out.println("not found");
                     } else {

@@ -15,6 +15,7 @@ import java.io.PrintStream;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class InteractiveModeTest {
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
@@ -31,10 +32,8 @@ public class InteractiveModeTest {
         commandSet.add(new Create());
         commandSet.add(new Drop());
         commandSet.add(new Exit());
-        commandSet.add(new FillTable());
         commandSet.add(new Get());
         commandSet.add(new List());
-        commandSet.add(new MakeDirs());
         commandSet.add(new Put());
         commandSet.add(new Remove());
         commandSet.add(new Rollback());
@@ -72,6 +71,17 @@ public class InteractiveModeTest {
         interpreter.scan = new Scanner(in);
         interpreter.startUp(null, false);
         assertEquals("$ " + TEST_TABLE_NAME + " exists\n$ $ created\n$ $ dropped\n$ ", outContent.toString());
+    }
+
+    @Test
+    public void getTypeListTestFromCreate() {
+        java.util.List<Class<?>> exactTypes = new LinkedList<>();
+        exactTypes.add(int.class);
+        exactTypes.add(String.class);
+        exactTypes.add(long.class);
+        exactTypes.add(char.class);
+        assertEquals(exactTypes, new Create().getTypeList("(int String long char)"));
+        assertNull(new Create().getTypeList("(int String long char bugaga)"));
     }
 
     @Test

@@ -1,7 +1,7 @@
 package ru.fizteh.fivt.students.MaximGotovchits.Parallel.test;
 
-import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.*;
@@ -26,10 +26,10 @@ public class ObjectTableTest {
         columnTypes.add(int.class);
         columnTypes.add(long.class);
         testTable = (ObjectTable) new ObjectTableProvider().createTable(name, columnTypes);
-        deserializedValue.subValueList.add(100500);
-        deserializedValue.subValueList.add((long) 10000000);
-        deserializedValue.typeKeeper = columnTypes;
-        deserializedValue.serialisedValue = "[100500, 10000000]";
+        deserializedValue.getSubValueList().add(100500);
+        deserializedValue.getSubValueList().add((long) 10000000);
+        deserializedValue.setTypeKeeper(columnTypes);
+        deserializedValue.setSerialisedValue("[100500, 10000000]");
     }
 
     @Test

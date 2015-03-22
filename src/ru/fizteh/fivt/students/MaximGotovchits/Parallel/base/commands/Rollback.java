@@ -6,7 +6,7 @@ public class Rollback extends Command {
     @Override
     public boolean execute(String[] cmd) {
         if (CommandTools.amountOfArgumentsIs(1, cmd)) {
-            CommandTools.currentTable.rollback();
+            CommandTools.currentTableProvider.getCurrentTableObject().rollback();
             return true;
         }
         return false;

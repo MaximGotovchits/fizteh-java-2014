@@ -15,15 +15,15 @@ public class ShowTables extends Command {
             for (File sub : file.listFiles()) {
                 if ((!sub.isHidden()) && sub.isDirectory()) {
                     recordsAmount = 0;
-                    for (Integer i = 0; i < CommandTools.DIR_NUM; ++i) {
+                    for (Integer i = 0; i < CommandTools.currentTableProvider.getDirNum(); ++i) {
                         currentFile = CommandTools.DATA_BASE_NAME + File.separator + sub.getName() + File.separator + i
-                                + CommandTools.DIR_EXT;
+                                + CommandTools.currentTableProvider.getDirExt();
                         File file1 = new File(currentFile);
                         if (file1.exists()) {
-                            for (Integer j = 0; j < CommandTools.FILE_NUM; ++j) {
+                            for (Integer j = 0; j < CommandTools.currentTableProvider.getFileNum(); ++j) {
                                 currentFile = CommandTools.DATA_BASE_NAME + File.separator + sub.getName()
-                                        + File.separator + i + CommandTools.DIR_EXT + File.separator + j
-                                        + CommandTools.FILE_EXT;
+                                        + File.separator + i + CommandTools.currentTableProvider.getDirExt()
+                                        + File.separator + j + CommandTools.currentTableProvider.getFileExt();
                                 file1 = new File(currentFile);
                                 try {
                                     if (file1.exists()) {

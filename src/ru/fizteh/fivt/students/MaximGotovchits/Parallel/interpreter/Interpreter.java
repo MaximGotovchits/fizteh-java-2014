@@ -1,6 +1,5 @@
 package ru.fizteh.fivt.students.MaximGotovchits.Parallel.interpreter;
 
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.base.commands.*;
 import java.util.*;
 
 public class Interpreter {
@@ -53,7 +52,7 @@ public class Interpreter {
             } else {
                 String[] exit = new String[1];
                 exit[0] = "exit";
-                new Exit().execute(exit);
+                System.exit(1);
             }
         }
     }

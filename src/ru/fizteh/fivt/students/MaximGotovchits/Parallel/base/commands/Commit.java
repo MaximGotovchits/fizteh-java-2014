@@ -7,7 +7,7 @@ public class Commit extends Command {
     @Override
     public boolean execute(String[] cmd) {
         if (CommandTools.amountOfArgumentsIs(1, cmd)) {
-            CommandTools.currentTable.commit();
+            CommandTools.currentTableProvider.getCurrentTableObject().commit();
             return true;
         }
         return false;

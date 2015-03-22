@@ -1,9 +1,7 @@
 package ru.fizteh.fivt.students.MaximGotovchits.Parallel.base.commands;
 
 import ru.fizteh.fivt.students.MaximGotovchits.Parallel.interpreter.Command;
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectStoreable;
 import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTable;
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTableProvider;
 import java.io.*;
 import java.text.ParseException;
 
@@ -36,18 +34,19 @@ public class Use extends Command {
             if (file.exists()) {
                 CommandTools.usingTableName = tableName;
                 if (CommandTools.tableIsChosen) {
-                    new FillTable().execute(null);
-                    CommandTools.currentTable.storage.get().clear();
-                    CommandTools.currentTable.commitStorage.clear();
+                    CommandTools.currentTableProvider.fillTable();
+                    CommandTools.currentTableProvider.getCurrentTableObject().storage.get().clear();
+                    CommandTools.currentTableProvider.getCurrentTableObject().commitStorage.clear();
                 }
-                CommandTools.currentTable = new ObjectTable(CommandTools.DATA_BASE_NAME + File.separator
-                        + CommandTools.usingTableName);
-                for (Integer i = 0; i < CommandTools.DIR_NUM; ++i) {
-                    for (Integer j = 0; j < CommandTools.FILE_NUM; ++j) {
+                CommandTools.currentTableProvider.setCurrentTableObject(new ObjectTable(CommandTools.DATA_BASE_NAME
+                        + File.separator + CommandTools.usingTableName));
+                for (Integer i = 0; i < CommandTools.currentTableProvider.getDirNum(); ++i) {
+                    for (Integer j = 0; j < CommandTools.currentTableProvider.getFileNum(); ++j) {
                         tablePath = CommandTools.DATA_BASE_NAME + File.separator + tableName + File.separator
-                                + i + CommandTools.DIR_EXT + File.separator + j + CommandTools.FILE_EXT;
+                                + i + CommandTools.currentTableProvider.getDirExt() + File.separator + j
+                                + CommandTools.currentTableProvider.getFileExt();
                         if (new File(tablePath).exists()) {
-                            fillStorage(tablePath, file);
+                            CommandTools.currentTableProvider.fillStorage(tablePath, file);
                             PrintWriter writer = new PrintWriter(new File(tablePath));
                             writer.print("");
                             writer.close();
@@ -63,34 +62,7 @@ public class Use extends Command {
         } else {
             System.out.println("using " + oldTableName);
         }
-        CommandTools.usingTableName = CommandTools.currentTable.getName();
+        CommandTools.usingTableName = CommandTools.currentTableProvider.getCurrentTableObject().getName();
         return true;
-    }
-
-    void fillStorage(String datName, File file) throws IOException, ParseException {
-        DataInputStream stream = new DataInputStream(new FileInputStream(datName));
-        file = new File(datName);
-        byte[] data = new byte[(int) file.length()];
-        stream.read(data);
-        int counter = 0;
-        int offset = 0;
-        String keyForMap = "";
-        String value = "";
-        String aLL = new String(data);
-        while (counter < file.length()) {
-            offset = data[counter];
-            keyForMap = new String(data, counter + 2, offset - 2, CommandTools.UTF);
-            counter = counter + offset + 1;
-            offset = data[counter];
-            value = new String(data, counter + 2,  data.length - counter - 3, CommandTools.UTF);
-            value = value.replaceAll("^\\s*|\\s*$", "");
-            String tableName = new File(new File(datName).getParent()).getParent();
-            ObjectStoreable valForMap = (ObjectStoreable)
-                    new ObjectTableProvider().deserialize(new ObjectTable(tableName), value);
-            CommandTools.currentTable.storage.get().put(keyForMap, valForMap);
-            CommandTools.currentTable.commitStorage.put(keyForMap, valForMap);
-            counter = counter + offset + 3;
-        }
-        stream.close();
     }
 }
