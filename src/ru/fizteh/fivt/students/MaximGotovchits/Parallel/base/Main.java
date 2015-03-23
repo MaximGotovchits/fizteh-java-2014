@@ -9,7 +9,6 @@ import java.util.Set;
 
 public class Main { // Using JSON format.
     public static void main(final String[] args) throws Exception {
-        makeDirs();
         Set<Command> commandSet = new HashSet<>();
         boolean fromCmdLine;
         if (args.length == 0) {
@@ -27,9 +26,10 @@ public class Main { // Using JSON format.
     }
 
     private static void launchInterpreter(boolean fromCmdLine, Set<Command> commandSet, String cmd) {
-            fillCommandSet(commandSet);
-            Interpreter interpreter = new Interpreter(commandSet);
-            interpreter.startUp(cmd, fromCmdLine);
+        makeDirs();
+        fillCommandSet(commandSet);
+        Interpreter interpreter = new Interpreter(commandSet);
+        interpreter.startUp(cmd, fromCmdLine);
     }
 
     private static void fillCommandSet(Set<Command> commandSet) {

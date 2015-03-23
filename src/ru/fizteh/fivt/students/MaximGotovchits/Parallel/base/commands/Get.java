@@ -9,7 +9,7 @@ public class Get extends Command {
         if (CommandTools.amountOfArgumentsIs(2, cmd)) {
             try {
                 if (CommandTools.tableIsChosen) {
-                    ObjectStoreable temp = (ObjectStoreable) CommandTools.currentTableProvider.getCurrentTableObject()
+                    ObjectStoreable temp = (ObjectStoreable) CommandTools.currentTableProvider.getUsingTable()
                             .get(cmd[1]);
                     if (temp == null) {
                         System.err.println("not found");

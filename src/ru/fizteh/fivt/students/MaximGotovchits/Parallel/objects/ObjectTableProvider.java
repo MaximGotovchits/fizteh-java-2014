@@ -1,22 +1,24 @@
 package ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects;
 
 import ru.fizteh.fivt.storage.structured.ColumnFormatException;
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.base.commands.*;
 import ru.fizteh.fivt.storage.structured.Storeable;
 import ru.fizteh.fivt.storage.structured.Table;
 import ru.fizteh.fivt.storage.structured.TableProvider;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.base.commands.CommandTools;
+
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ObjectTableProvider implements TableProvider {
+    private static Set<Class<?>> allowedTypes;
+    private static final Charset UTF = StandardCharsets.UTF_8;
     private static final int DIR_NUM = 16;
     private static final int FILE_NUM = 16;
     private static final String DIR_EXT = ".dir";
@@ -28,15 +30,28 @@ public class ObjectTableProvider implements TableProvider {
     private static String usingTableName;
     private static ObjectTable currentTableObject;
     private static final String SIGNATURE_FILENAME = "signature.tsv";
-    private static Boolean tableIsChosen = false;
+    private static boolean tableIsChosen = false;
     private static String dataBaseName = System.getProperty("fizteh.db.dir");
     private volatile boolean writeSectionIsInUse = false;
     private String rootDirectory = "";
+    private void fillAllowedTypes() {
+        allowedTypes.add(Integer.class);
+        allowedTypes.add(Long.class);
+        allowedTypes.add(Boolean.class);
+        allowedTypes.add(String.class);
+        allowedTypes.add(Byte.class);
+        allowedTypes.add(Double.class);
+        allowedTypes.add(Float.class);
+    }
+
     public ObjectTableProvider() {
+        fillAllowedTypes();
         rootDirectory = dataBaseName;
     }
 
+
     public ObjectTableProvider(String dir) {
+        fillAllowedTypes();
         dataBaseName = dir;
         rootDirectory = dir;
     }
@@ -45,36 +60,20 @@ public class ObjectTableProvider implements TableProvider {
         return Objects.hashCode(this.rootDirectory);
     }
 
-    public ObjectTable getCurrentTableObject() {
-        return currentTableObject;
-    }
-
     public String getDataBaseName() {
         return dataBaseName;
     }
 
+    public ObjectTable getUsingTable() {
+        return currentTableObject;
+    }
+
+    public String getUsingTableName() {
+        return usingTableName;
+    }
+
     public String getSugnatureFilename() {
         return SIGNATURE_FILENAME;
-    }
-
-    public void setCurrentTableObject(ObjectTable toAssign) {
-        currentTableObject = toAssign;
-    }
-
-    public int getDirNum() {
-        return DIR_NUM;
-    }
-
-    public int getFileNum() {
-        return FILE_NUM;
-    }
-
-    public String getDirExt() {
-        return DIR_EXT;
-    }
-
-    public String getFileExt() {
-        return FILE_EXT;
     }
 
     @Override
@@ -111,17 +110,16 @@ public class ObjectTableProvider implements TableProvider {
         } else {
             file.mkdir();
             signatureFile.createNewFile();
-            PrintWriter writer = new PrintWriter(signatureFile, CommandTools.UTF.toString());
-            String tempTypes = new String();
+            PrintWriter writer = new PrintWriter(signatureFile, UTF.toString());
+            List<String> tempTypes = new LinkedList<>();
             for (Class<?> type : columnTypes) {
                 if (type.equals(String.class)) {
-                    tempTypes += "String ";
+                    tempTypes.add("String");
                 } else {
-                    tempTypes += type.getName() + " ";
+                    tempTypes.add(type.getName());
                 }
             }
-            tempTypes = tempTypes.substring(0, tempTypes.length() - 1);
-            writer.println(tempTypes);
+            writer.println(String.join(" ", tempTypes));
             writer.close();
         }
         readWriteLock.writeLock().unlock();
@@ -138,8 +136,8 @@ public class ObjectTableProvider implements TableProvider {
         if (toBeRemoved.exists()) {
             if (tableIsChosen) {
                 if (usingTableName.equals(name)) {
-                    currentTableObject.storage.get().clear();
-                    currentTableObject.commitStorage.clear();
+                    currentTableObject.getStorage().get().clear();
+                    currentTableObject.getCommitStorage().clear();
                     tableIsChosen = false;
                     usingTableName = null;
                 }
@@ -168,7 +166,7 @@ public class ObjectTableProvider implements TableProvider {
         int index = 0;
         List<Class<?>> typeList = new LinkedList<>();
         for (String str : tempValue) {
-            Object val = getValue(str, usingTable.typeKeeper.get(index));
+            Object val = getValue(str, usingTable.getTypeKeeper().get(index));
             if (val.equals(INCORRECT_SYMBOL)) {
                 throw new ParseException(value, 0);
             }
@@ -176,7 +174,7 @@ public class ObjectTableProvider implements TableProvider {
             typeList.add(val.getClass());
             ++index;
         }
-        valueToReturn.setTypeKeeper(usingTable.typeKeeper);
+        valueToReturn.setTypeKeeper(usingTable.getTypeKeeper());
         return valueToReturn;
     }
 
@@ -185,7 +183,7 @@ public class ObjectTableProvider implements TableProvider {
         ObjectStoreable valueToSerialize = (ObjectStoreable) value;
         ObjectTable tableObj = (ObjectTable) table;
         int index = 0;
-        for (Class<?> type : tableObj.typeKeeper) {
+        for (Class<?> type : tableObj.getTypeKeeper()) {
             if (!type.equals(valueToSerialize.getTypeKeeper().get(index))) {
                 throw new ColumnFormatException();
             }
@@ -207,11 +205,11 @@ public class ObjectTableProvider implements TableProvider {
         if (values.size() != tempTable.getColumnsCount()) {
             throw new IndexOutOfBoundsException();
         }
-        if (!valTypes.equals(tempTable.typeKeeper)) {
+        if (!valTypes.equals(tempTable.getTypeKeeper())) {
             throw new ColumnFormatException();
         }
         ObjectStoreable toReturn = new ObjectStoreable(values);
-        toReturn.setTypeKeeper(tempTable.typeKeeper);
+        toReturn.setTypeKeeper(tempTable.getTypeKeeper());
         return toReturn;
     }
 
@@ -227,28 +225,97 @@ public class ObjectTableProvider implements TableProvider {
         return list;
     }
 
-    private Object getValue(String str, Class<?> expectedType)
-            throws NumberFormatException {
-        if (expectedType.equals(int.class)) {
-            if (isNull(str)) {
-                return null;
+    public int getChangesNumber() {
+        return getUsingTable().getStorage().get().size() - getUsingTable().getCommitStorage().size();
+    }
+
+    public int getStorageSize() {
+        return getUsingTable().getStorage().get().size();
+    }
+
+    public boolean changeUsingTable(String tableName, String oldTableName) throws IOException, ParseException {
+        if (!tableName.equals(oldTableName)) {
+            String outputName = tableName;
+            String tablePath = CommandTools.DATA_BASE_NAME + File.separator + tableName;
+            File file = new File(tablePath);
+            if (file.exists()) {
+                usingTableName = tableName;
+                if (tableIsChosen) {
+                    fillTable();
+                    currentTableObject.getStorage().get().clear();
+                    currentTableObject.getCommitStorage().clear();
+                }
+                currentTableObject = new ObjectTable(CommandTools.DATA_BASE_NAME + File.separator + usingTableName);
+                for (Integer i = 0; i < DIR_NUM; ++i) {
+                    for (Integer j = 0; j < FILE_NUM; ++j) {
+                        tablePath = CommandTools.DATA_BASE_NAME + File.separator + tableName + File.separator
+                                + i + DIR_EXT + File.separator + j + FILE_EXT;
+                        if (new File(tablePath).exists()) {
+                            fillStorage(tablePath);
+                            PrintWriter writer = new PrintWriter(new File(tablePath));
+                            writer.print("");
+                            writer.close();
+                        }
+                    }
+                }
+                System.out.println("using " + outputName);
+                tableIsChosen = true;
+            } else {
+                System.err.println(tableName + " not exists");
+                return false;
             }
-            Integer toReturn = Integer.parseInt(str);
-            return toReturn;
+        } else {
+            System.out.println("using " + oldTableName);
         }
-        if (expectedType.equals(long.class)) {
-            if (isNull(str)) {
-                return null;
+        usingTableName = currentTableObject.getName();
+        return true;
+    }
+
+    public List<String> getAdvancedTableNames() {
+        String currentFile;
+        int recordsAmount;
+        List<String> tableNamesList = new LinkedList<>();
+        File file = new File(CommandTools.DATA_BASE_NAME);
+        for (File sub : file.listFiles()) {
+            if ((!sub.isHidden()) && sub.isDirectory()) {
+                recordsAmount = 0;
+                for (Integer i = 0; i < DIR_NUM; ++i) {
+                    currentFile = CommandTools.DATA_BASE_NAME + File.separator + sub.getName() + File.separator + i
+                            + DIR_EXT;
+                    File file1 = new File(currentFile);
+                    if (file1.exists()) {
+                        for (Integer j = 0; j < FILE_NUM; ++j) {
+                            currentFile = CommandTools.DATA_BASE_NAME + File.separator + sub.getName() + File.separator
+                                    + i + DIR_EXT + File.separator + j + FILE_EXT;
+                            file1 = new File(currentFile);
+                            try {
+                                if (file1.exists()) {
+                                    DataInputStream stream = new DataInputStream(new FileInputStream(currentFile));
+                                    byte[] data = new byte[(int) file1.length()];
+                                    stream.read(data);
+                                    String temp = new String(data, StandardCharsets.UTF_8);
+                                    recordsAmount += (temp.length() - temp.replaceAll(" ", "").length()) / 4;
+                                }
+                            } catch (FileNotFoundException e) {
+                                System.err.println(e);
+                            } catch (IOException e) {
+                                System.err.println(e);
+                            }
+                        }
+                    }
+                }
+                tableNamesList.add(sub.getName() + " " + recordsAmount);
             }
-            Long toReturn = Long.parseLong(str);
-            return toReturn;
         }
-        if (expectedType.equals(boolean.class)) {
+        return tableNamesList;
+    }
+
+    private Object getValue(String str, Class<?> expectedType) throws NumberFormatException {
+        if (allowedTypes.contains(expectedType)) {
             if (isNull(str)) {
                 return null;
             }
-            Boolean toReturn = Boolean.parseBoolean(str);
-            return toReturn;
+            return expectedType;
         }
         if (expectedType.equals(String.class)) {
             if (isNull(str)) {
@@ -260,27 +327,6 @@ public class ObjectTableProvider implements TableProvider {
             } else {
                 throw new NumberFormatException();
             }
-        }
-        if (expectedType.equals(byte.class)) {
-            if (isNull(str)) {
-                return null;
-            }
-            Byte toReturn = Byte.parseByte(str);
-            return toReturn;
-        }
-        if (expectedType.equals(double.class)) {
-            if (isNull(str)) {
-                return null;
-            }
-            Double toReturn = Double.parseDouble(str);
-            return toReturn;
-        }
-        if (expectedType.equals(float.class)) {
-            if (isNull(str)) {
-                return null;
-            }
-            Float toReturn = Float.parseFloat(str);
-            return toReturn;
         }
         return INCORRECT_SYMBOL;
     }
@@ -312,34 +358,10 @@ public class ObjectTableProvider implements TableProvider {
     }
 
     private List<Class<?>> convertToPrimitive(List<?> list) {
-        List<Class<?>> toReturn = new LinkedList<Class<?>>();
+        List<Class<?>> toReturn = new LinkedList<>();
         for (Object object : list) {
-            if (object.getClass().equals(Integer.class)) {
-                toReturn.add(int.class);
-                continue;
-            }
-            if (object.getClass().equals(Long.class)) {
-                toReturn.add(long.class);
-                continue;
-            }
-            if (object.getClass().equals(Boolean.class)) {
-                toReturn.add(boolean.class);
-                continue;
-            }
-            if (object.getClass().equals(String.class)) {
-                toReturn.add(String.class);
-                continue;
-            }
-            if (object.getClass().equals(Byte.class)) {
-                toReturn.add(byte.class);
-                continue;
-            }
-            if (object.getClass().equals(Double.class)) {
-                toReturn.add(double.class);
-                continue;
-            }
-            if (object.getClass().equals(Float.class)) {
-                toReturn.add(float.class);
+            if (allowedTypes.contains(object.getClass())) {
+                toReturn.add(object.getClass());
                 continue;
             }
         }
@@ -348,11 +370,11 @@ public class ObjectTableProvider implements TableProvider {
 
     public static void fillTable() {
         for (Map.Entry<String, ObjectStoreable> entry : currentTableObject
-                .commitStorage.entrySet()) {
+                .getCommitStorage().entrySet()) {
             int hashCode = entry.getKey().hashCode();
             Integer nDirectory = hashCode % DIR_NUM;
             Integer nFile = hashCode / DIR_NUM % FILE_NUM;
-            Path fileName = Paths.get(CommandTools.DATA_BASE_NAME, currentTableObject.getName(),
+            Path fileName = Paths.get(dataBaseName, currentTableObject.getName(),
                     nDirectory + DIR_EXT);
             File file = new File(fileName.toString());
             if (!file.exists()) {
@@ -364,11 +386,11 @@ public class ObjectTableProvider implements TableProvider {
                 if (!file.exists()) {
                     file.createNewFile();
                 }
-                byte[] bytesKey = (" " + entry.getKey() + " ").getBytes(CommandTools.UTF);
+                byte[] bytesKey = (" " + entry.getKey() + " ").getBytes(UTF);
                 DataOutputStream stream = new DataOutputStream(new FileOutputStream(fileName.toString(), true));
                 stream.write(bytesKey.length);
                 stream.write(bytesKey);
-                byte[] bytesVal = ((" " + entry.getValue().getSerialisedValue() + " ").getBytes(CommandTools.UTF));
+                byte[] bytesVal = ((" " + entry.getValue().getSerialisedValue() + " ").getBytes(UTF));
                 stream.write(bytesVal.length - 1);
                 stream.write(bytesVal);
                 stream.close();
@@ -378,9 +400,9 @@ public class ObjectTableProvider implements TableProvider {
         }
     }
 
-    public static void fillStorage(String datName, File file) throws IOException, ParseException {
+    public static void fillStorage(String datName) throws IOException, ParseException {
         DataInputStream stream = new DataInputStream(new FileInputStream(datName));
-        file = new File(datName);
+        File file = new File(datName);
         byte[] data = new byte[(int) file.length()];
         stream.read(data);
         int counter = 0;
@@ -389,16 +411,16 @@ public class ObjectTableProvider implements TableProvider {
         String value ;
         while (counter < file.length()) {
             offset = data[counter];
-            keyForMap = new String(data, counter + 2, offset - 2, CommandTools.UTF);
+            keyForMap = new String(data, counter + 2, offset - 2, UTF);
             counter = counter + offset + 1;
             offset = data[counter];
-            value = new String(data, counter + 2,  data.length - counter - 3, CommandTools.UTF);
+            value = new String(data, counter + 2,  data.length - counter - 3, UTF);
             value = value.replaceAll("^\\s*|\\s*$", "");
             String tableName = new File(new File(datName).getParent()).getParent();
             ObjectStoreable valForMap = (ObjectStoreable)
                     new ObjectTableProvider().deserialize(new ObjectTable(tableName), value);
-            currentTableObject.storage.get().put(keyForMap, valForMap);
-            currentTableObject.commitStorage.put(keyForMap, valForMap);
+            currentTableObject.getStorage().get().put(keyForMap, valForMap);
+            currentTableObject.getCommitStorage().put(keyForMap, valForMap);
             counter = counter + offset + 3;
         }
         stream.close();

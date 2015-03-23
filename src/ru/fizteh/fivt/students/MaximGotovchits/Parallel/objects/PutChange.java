@@ -11,6 +11,6 @@ public class PutChange extends Change {
 
     @Override
     public void execute(ObjectTable table) {
-        table.storage.get().put(key, value);
+        table.getStorage().get().put(key, value);
     }
 }

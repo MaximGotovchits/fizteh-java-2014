@@ -3,11 +3,10 @@ package ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects;
 import ru.fizteh.fivt.storage.structured.ColumnFormatException;
 import ru.fizteh.fivt.storage.structured.Storeable;
 import java.text.ParseException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class ObjectStoreable implements Storeable {
+    private static Set<Class<?>> allowedTypes;
     private static final String LEFT_BRACE = "[";
     private static final String RIGHT_BRACE = "]";
     private static final String VALUE_SEPARATOR = ", ";
@@ -16,7 +15,19 @@ public class ObjectStoreable implements Storeable {
     private String serialisedValue;
     private List<Class<?>> typeKeeper = new LinkedList<>();
 
-    public ObjectStoreable() {}
+    private void fillAllowedTypes() {
+        allowedTypes.add(Integer.class);
+        allowedTypes.add(Long.class);
+        allowedTypes.add(Boolean.class);
+        allowedTypes.add(String.class);
+        allowedTypes.add(Byte.class);
+        allowedTypes.add(Double.class);
+        allowedTypes.add(Float.class);
+    }
+
+    public ObjectStoreable() {
+        fillAllowedTypes();
+    }
 
     public List<Object> getSubValueList() {
         return subValueList;
@@ -39,19 +50,22 @@ public class ObjectStoreable implements Storeable {
     }
 
     public ObjectStoreable(List<?> values) {
+        fillAllowedTypes();
         serialisedValue = LEFT_BRACE;
         for (Object val : values) {
             subValueList.add(val);
-            serialisedValue += val + VALUE_SEPARATOR;
         }
+        serialisedValue = String.join(VALUE_SEPARATOR, (List<String>) values);
         completeSerialisedValue();
     }
 
     public ObjectStoreable(ObjectTable table) {
-        typeKeeper = table.typeKeeper;
+        fillAllowedTypes();
+        typeKeeper = table.getTypeKeeper();
     }
 
     public ObjectStoreable(String value) throws ParseException {
+        fillAllowedTypes();
         ObjectStoreable obj = (ObjectStoreable) new ObjectTableProvider().deserialize(currentTableObject, value);
         if (obj == null) {
             return;
@@ -85,12 +99,13 @@ public class ObjectStoreable implements Storeable {
         if (!typeKeeper.get(columnIndex).equals(toConvert.get(0))) {
             throw new ColumnFormatException();
         }
-        this.subValueList.set(columnIndex, value);
-        this.serialisedValue = "";
+        subValueList.set(columnIndex, value);
+        serialisedValue = "";
         serialisedValue = LEFT_BRACE;
-        for (Object val : this.subValueList) {
+        for (Object val : subValueList) { // Can't use join cuz serialisedValue has type List<Object>.
             serialisedValue += val + VALUE_SEPARATOR;
         }
+        serialisedValue = serialisedValue.substring(0, serialisedValue.length() - 1);
         completeSerialisedValue();
     }
 
@@ -158,35 +173,13 @@ public class ObjectStoreable implements Storeable {
         }
     }
 
+
+
     private List<Class<?>> convertToPrimitive(List<Class<?>> list) {
         List<Class<?>> toReturn = new LinkedList<>();
         for (Class<?> object : list) {
-            if (object.equals(Integer.class)) {
-                toReturn.add(int.class);
-                continue;
-            }
-            if (object.equals(Long.class)) {
-                toReturn.add(long.class);
-                continue;
-            }
-            if (object.equals(Boolean.class)) {
-                toReturn.add(boolean.class);
-                continue;
-            }
-            if (object.equals(String.class)) {
-                toReturn.add(String.class);
-                continue;
-            }
-            if (object.equals(Byte.class)) {
-                toReturn.add(byte.class);
-                continue;
-            }
-            if (object.equals(Double.class)) {
-                toReturn.add(double.class);
-                continue;
-            }
-            if (object.equals(Float.class)) {
-                toReturn.add(float.class);
+            if (allowedTypes.contains(object)) {
+                toReturn.add(object);
                 continue;
             }
         }
@@ -194,7 +187,7 @@ public class ObjectStoreable implements Storeable {
     }
 
     private void completeSerialisedValue() {
-        serialisedValue = serialisedValue.substring(0, serialisedValue.length() - 2);
+        serialisedValue = serialisedValue.substring(0, serialisedValue.length() - 1);
         serialisedValue += RIGHT_BRACE;
     }
 }

@@ -2,47 +2,13 @@ package ru.fizteh.fivt.students.MaximGotovchits.Parallel.base.commands;
 
 import ru.fizteh.fivt.students.MaximGotovchits.Parallel.interpreter.Command;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-
 public class ShowTables extends Command {
     @Override
     public boolean execute(String[] cmd) {
         if (CommandTools.amountOfArgumentsIs(2, cmd)) {
-            String currentFile;
-            int recordsAmount;
-            File file = new File(CommandTools.DATA_BASE_NAME);
-            for (File sub : file.listFiles()) {
-                if ((!sub.isHidden()) && sub.isDirectory()) {
-                    recordsAmount = 0;
-                    for (Integer i = 0; i < CommandTools.currentTableProvider.getDirNum(); ++i) {
-                        currentFile = CommandTools.DATA_BASE_NAME + File.separator + sub.getName() + File.separator + i
-                                + CommandTools.currentTableProvider.getDirExt();
-                        File file1 = new File(currentFile);
-                        if (file1.exists()) {
-                            for (Integer j = 0; j < CommandTools.currentTableProvider.getFileNum(); ++j) {
-                                currentFile = CommandTools.DATA_BASE_NAME + File.separator + sub.getName()
-                                        + File.separator + i + CommandTools.currentTableProvider.getDirExt()
-                                        + File.separator + j + CommandTools.currentTableProvider.getFileExt();
-                                file1 = new File(currentFile);
-                                try {
-                                    if (file1.exists()) {
-                                        DataInputStream stream = new DataInputStream(new FileInputStream(currentFile));
-                                        byte[] data = new byte[(int) file1.length()];
-                                        stream.read(data);
-                                        String temp = new String(data, StandardCharsets.UTF_8);
-                                        recordsAmount += (temp.length() - temp.replaceAll(" ", "").length()) / 4;
-                                    }
-                                } catch (FileNotFoundException e) {
-                                    System.err.println(e);
-                                } catch (IOException e) {
-                                    System.err.println(e);
-                                }
-                            }
-                        }
-                    }
-                    System.out.println(sub.getName() + " " + recordsAmount);
-                }
+            java.util.List<String> tableNamesList = CommandTools.currentTableProvider.getAdvancedTableNames();
+            for (String tmp : tableNamesList) {
+                System.out.println(tmp);
             }
             return true;
         }

@@ -15,8 +15,8 @@ public class Put extends Command {
                 putParameter = String.join(" " , Arrays.copyOfRange(cmd, 2, cmd.length));
                 try {
                     ObjectStoreable value = (ObjectStoreable) new ObjectTableProvider().
-                            deserialize(CommandTools.currentTableProvider.getCurrentTableObject(), putParameter);
-                    ObjectStoreable temp = (ObjectStoreable) CommandTools.currentTableProvider.getCurrentTableObject()
+                            deserialize(CommandTools.currentTableProvider.getUsingTable(), putParameter);
+                    ObjectStoreable temp = (ObjectStoreable) CommandTools.currentTableProvider.getUsingTable()
                             .put(key, value);
                     if (temp == null) {
                         System.out.println("new");

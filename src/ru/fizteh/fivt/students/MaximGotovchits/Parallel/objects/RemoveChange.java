@@ -8,6 +8,6 @@ public class RemoveChange extends Change {
 
     @Override
     public void execute(ObjectTable table) {
-        table.storage.get().remove(key);
+        table.getStorage().get().remove(key);
     }
 }

@@ -249,33 +249,40 @@ import java.util.List;
 public class ObjectTable implements Table {
     private int overwriteNum = 0;
 
-    public ThreadLocal<Stack> lastChanges = new ThreadLocal<Stack>() {
+    private ThreadLocal<Stack> lastChanges = new ThreadLocal<Stack>() {
         @Override
         protected Stack initialValue() {
             return new Stack();
         }
     };
 
-    public ThreadLocal<HashMap<String, ObjectStoreable>> storage = new ThreadLocal<HashMap<String, ObjectStoreable>>() {
+    private static Map<String, Class<?>> allowedTypes;
+
+    private ThreadLocal<HashMap<String, ObjectStoreable>> storage = new ThreadLocal<HashMap<String,
+            ObjectStoreable>>() {
         @Override
         protected HashMap<String, ObjectStoreable> initialValue() {
             return new HashMap<>();
         }
     };
 
-    public Map<String, ObjectStoreable> commitStorage = new HashMap<>();
-    public String tableName = new String();
-    public List<Class<?>> typeKeeper = new LinkedList<>();
+    private Map<String, ObjectStoreable> commitStorage = new HashMap<>();
+    private String tableName = new String();
+    private List<Class<?>> typeKeeper = new LinkedList<>();
 
-    public ObjectTable() { }
+    public ObjectTable() {
+        fillAllowedTypes();
+    }
 
     public ObjectTable(Table table) {
+        fillAllowedTypes();
         ObjectTable temp = (ObjectTable) table;
         this.tableName = temp.tableName;
         this.typeKeeper = temp.typeKeeper;
     }
 
     public ObjectTable(String name) {
+        fillAllowedTypes();
         ObjectTableProvider tmp = new ObjectTableProvider();
         if (!new File(name).isAbsolute()) {
             name = new ObjectTableProvider().getDataBaseName() + File.separator + name;
@@ -294,10 +301,21 @@ public class ObjectTable implements Table {
     }
 
     public ObjectTable(String name, List<Class<?>> typeList) {
-        for (Class<?> type : typeList) {
-            typeKeeper.add(type);
-        }
+        fillAllowedTypes();
+        typeKeeper.addAll(typeList);
         tableName = name;
+    }
+
+    public List<Class<?>> getTypeKeeper() {
+        return typeKeeper;
+    }
+
+    public Map<String, ObjectStoreable> getCommitStorage() {
+        return commitStorage;
+    }
+
+    public ThreadLocal<HashMap<String, ObjectStoreable>> getStorage() {
+        return storage;
     }
 
     @Override
@@ -369,10 +387,7 @@ public class ObjectTable implements Table {
     @Override
     public List<String> list() {
         LinkedList<String> list = new LinkedList<String>();
-        Set<String> k = storage.get().keySet();
-        for (Object iter : k) {
-            list.add(iter.toString());
-        }
+        list.addAll(storage.get().keySet());
         return list;
     }
 
@@ -425,32 +440,18 @@ public class ObjectTable implements Table {
         }
     }
 
+    private void fillAllowedTypes() {
+        allowedTypes.put("int", Integer.class);
+        allowedTypes.put("long", Long.class);
+        allowedTypes.put("boolean", Boolean.class);
+        allowedTypes.put("string", String.class);
+        allowedTypes.put("byte", Byte.class);
+        allowedTypes.put("double", Double.class);
+        allowedTypes.put("float", Float.class);
+    }
+
     public Class<?> getType(String typeName) {
-        if (typeName.equals("int")) {
-            return int.class;
-        }
-        if (typeName.equals("long")) {
-            return long.class;
-        }
-        if (typeName.equals("byte")) {
-            return byte.class;
-        }
-        if (typeName.equals("float")) {
-            return float.class;
-        }
-        if (typeName.equals("double")) {
-            return double.class;
-        }
-        if (typeName.equals("boolean")) {
-            return boolean.class;
-        }
-        if (typeName.equals("String") || typeName.equals("string")) {
-            return String.class;
-        }
-        if (typeName.equals("char")) {
-            return char.class;
-        }
-        return null;
+        return allowedTypes.get(typeName);
     }
 }
 
