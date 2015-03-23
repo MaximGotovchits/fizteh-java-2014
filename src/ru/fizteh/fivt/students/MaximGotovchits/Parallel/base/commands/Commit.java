@@ -1,16 +1,9 @@
 package ru.fizteh.fivt.students.MaximGotovchits.Parallel.base.commands;
 
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.interpreter.Command;
-
-public class Commit extends Command {
-
+public class Commit extends CommandWithCheckedNumArgs {
     @Override
-    public boolean execute(String[] cmd) {
-        if (CommandTools.amountOfArgumentsIs(1, cmd)) {
-            CommandTools.currentTableProvider.getUsingTable().commit();
-            return true;
-        }
-        return false;
+    void executeWithCompleteArgs(String[] cmd) {
+        CommandTools.getUsingTable().commit();
     }
 
     @Override

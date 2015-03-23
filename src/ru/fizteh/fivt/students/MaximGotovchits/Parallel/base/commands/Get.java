@@ -1,32 +1,28 @@
 package ru.fizteh.fivt.students.MaximGotovchits.Parallel.base.commands;
 
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.interpreter.Command;
 import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectStoreable;
 
-public class Get extends Command {
+public class Get extends CommandWithCheckedNumArgs {
     @Override
-    public boolean execute(String[] cmd) {
-        if (CommandTools.amountOfArgumentsIs(2, cmd)) {
-            try {
-                if (CommandTools.tableIsChosen) {
-                    ObjectStoreable temp = (ObjectStoreable) CommandTools.currentTableProvider.getUsingTable()
-                            .get(cmd[1]);
-                    if (temp == null) {
-                        System.err.println("not found");
-                    } else {
-                        System.out.println("found");
-                        System.out.println(temp.getSerialisedValue());
-                    }
+    void executeWithCompleteArgs(String[] cmd) {
+        try {
+            if (CommandTools.tableIsChosen) {
+                ObjectStoreable temp = (ObjectStoreable) CommandTools.getUsingTable()
+                        .get(cmd[1]);
+                if (temp == null) {
+                    System.err.println("not found");
                 } else {
-                    CommandTools.informToChooseTable();
+                    System.out.println("found");
+                    System.out.println(temp.getSerialisedValue());
                 }
-            } catch (Exception e) {
-                System.out.println(e);
+            } else {
+                CommandTools.informToChooseTable();
             }
-            return true;
+        } catch (Exception e) {
+            System.out.println(e);
         }
-        return false;
     }
+
     @Override
     public String getCmdName() {
         return "get";

@@ -9,23 +9,20 @@ import java.util.Set;
 
 public class Main { // Using JSON format.
     public static void main(final String[] args) throws Exception {
-        Set<Command> commandSet = new HashSet<>();
         boolean fromCmdLine;
         if (args.length == 0) {
             fromCmdLine = false;
-            launchInterpreter(fromCmdLine, commandSet, null);
-            fillCommandSet(commandSet);
-            Interpreter interpreter = new Interpreter(commandSet);
-            interpreter.startUp(null, false);
+            launchInterpreter(fromCmdLine, null);
         } else {
             fromCmdLine = true;
             String cmd = String.join(" ", args).replaceAll("\\s+", " ");
-            launchInterpreter(fromCmdLine, commandSet, cmd);
+            launchInterpreter(fromCmdLine, cmd);
             new Exit().execute(null);
         }
     }
 
-    private static void launchInterpreter(boolean fromCmdLine, Set<Command> commandSet, String cmd) {
+    private static void launchInterpreter(boolean fromCmdLine, String cmd) {
+        Set<Command> commandSet = new HashSet<>();
         makeDirs();
         fillCommandSet(commandSet);
         Interpreter interpreter = new Interpreter(commandSet);

@@ -285,7 +285,7 @@ public class ObjectTable implements Table {
         fillAllowedTypes();
         ObjectTableProvider tmp = new ObjectTableProvider();
         if (!new File(name).isAbsolute()) {
-            name = new ObjectTableProvider().getDataBaseName() + File.separator + name;
+            name = tmp.getDataBaseName() + File.separator + name;
         }
         this.tableName = new File(name).getName();
         if (!new File(name + File.separator + tmp.getSugnatureFilename()).isAbsolute()) {
@@ -441,13 +441,14 @@ public class ObjectTable implements Table {
     }
 
     private void fillAllowedTypes() {
-        allowedTypes.put("int", Integer.class);
-        allowedTypes.put("long", Long.class);
-        allowedTypes.put("boolean", Boolean.class);
+        allowedTypes = new HashMap<>();
+        allowedTypes.put("int", int.class);
+        allowedTypes.put("long", long.class);
+        allowedTypes.put("boolean", boolean.class);
         allowedTypes.put("string", String.class);
-        allowedTypes.put("byte", Byte.class);
-        allowedTypes.put("double", Double.class);
-        allowedTypes.put("float", Float.class);
+        allowedTypes.put("byte", byte.class);
+        allowedTypes.put("double", double.class);
+        allowedTypes.put("float", float.class);
     }
 
     public Class<?> getType(String typeName) {

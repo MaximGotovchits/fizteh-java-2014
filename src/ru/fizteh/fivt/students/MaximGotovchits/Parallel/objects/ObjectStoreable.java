@@ -16,13 +16,14 @@ public class ObjectStoreable implements Storeable {
     private List<Class<?>> typeKeeper = new LinkedList<>();
 
     private void fillAllowedTypes() {
-        allowedTypes.add(Integer.class);
-        allowedTypes.add(Long.class);
-        allowedTypes.add(Boolean.class);
+        allowedTypes = new HashSet<>();
+        allowedTypes.add(int.class);
+        allowedTypes.add(long.class);
+        allowedTypes.add(boolean.class);
         allowedTypes.add(String.class);
-        allowedTypes.add(Byte.class);
-        allowedTypes.add(Double.class);
-        allowedTypes.add(Float.class);
+        allowedTypes.add(byte.class);
+        allowedTypes.add(double.class);
+        allowedTypes.add(float.class);
     }
 
     public ObjectStoreable() {
@@ -54,8 +55,9 @@ public class ObjectStoreable implements Storeable {
         serialisedValue = LEFT_BRACE;
         for (Object val : values) {
             subValueList.add(val);
+            serialisedValue += val + VALUE_SEPARATOR;
         }
-        serialisedValue = String.join(VALUE_SEPARATOR, (List<String>) values);
+        serialisedValue = serialisedValue.substring(0, serialisedValue.length() - 1); // Тут нельзя делать join.
         completeSerialisedValue();
     }
 
@@ -119,37 +121,37 @@ public class ObjectStoreable implements Storeable {
 
     @Override
     public Integer getIntAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
-        checkGetSomethingAtException(columnIndex);
+        checkGetSomethingAtException(columnIndex, int.class);
         return (Integer) subValueList.get(columnIndex);
     }
 
     @Override
     public Long getLongAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
-        checkGetSomethingAtException(columnIndex);
+        checkGetSomethingAtException(columnIndex, long.class);
         return (Long) subValueList.get(columnIndex);
     }
 
     @Override
     public Byte getByteAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
-        checkGetSomethingAtException(columnIndex);
+        checkGetSomethingAtException(columnIndex, byte.class);
         return (Byte) subValueList.get(columnIndex);
     }
 
     @Override
     public Float getFloatAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
-        checkGetSomethingAtException(columnIndex);
+        checkGetSomethingAtException(columnIndex, float.class);
         return (Float) subValueList.get(columnIndex);
     }
 
     @Override
     public Double getDoubleAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
-        checkGetSomethingAtException(columnIndex);
+        checkGetSomethingAtException(columnIndex, double.class);
         return (Double) subValueList.get(columnIndex);
     }
 
     @Override
     public Boolean getBooleanAt(int columnIndex) throws ColumnFormatException, IndexOutOfBoundsException {
-        checkGetSomethingAtException(columnIndex);
+        checkGetSomethingAtException(columnIndex, boolean.class);
         return (Boolean) subValueList.get(columnIndex);
     }
 
@@ -164,11 +166,11 @@ public class ObjectStoreable implements Storeable {
         return subValueList.get(columnIndex).toString();
     }
 
-    private void checkGetSomethingAtException(int columnIndex) {
+    private void checkGetSomethingAtException(int columnIndex, Class<?> expectedClass) {
         if (columnIndex >= this.typeKeeper.size()) {
             throw new IndexOutOfBoundsException();
         }
-        if (!typeKeeper.get(columnIndex).equals(boolean.class)) {
+        if (!typeKeeper.get(columnIndex).equals(expectedClass)) {
             throw new ColumnFormatException();
         }
     }

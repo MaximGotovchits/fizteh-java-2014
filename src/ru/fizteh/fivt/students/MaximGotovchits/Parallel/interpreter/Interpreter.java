@@ -1,13 +1,28 @@
 package ru.fizteh.fivt.students.MaximGotovchits.Parallel.interpreter;
 
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.base.commands.*;
+
 import java.util.*;
 
 public class Interpreter {
+    private static final int VAR_ARGS_NUM = 0;
     private static final String SPLIT_BY_SEMICOLON = "\\s*;\\s*";
     private static final String SECRET_TEST_WORD = "extremely_secret_word_for_test";
     private static final String INVITATIONAL_SYMBOL = "$ ";
     private static final String SPLIT_BY_SPACE = "\\s+";
     private Map<String, Command> commands = new HashMap<>();
+    private static final Map<Command, Integer> ARGS_NUM = new HashMap<>();
+    static {
+        ARGS_NUM.put(new Commit(), 1);
+        ARGS_NUM.put(new Drop(), 2);
+        ARGS_NUM.put(new Get(), 2);
+        ARGS_NUM.put(new ru.fizteh.fivt.students.MaximGotovchits.Parallel.base.commands.List(), 1);
+        ARGS_NUM.put(new Remove(), 2);
+        ARGS_NUM.put(new Rollback(), 1);
+        ARGS_NUM.put(new ShowTables(), 2);
+        ARGS_NUM.put(new Use(), 2);
+    }
+
     public Scanner scan = new Scanner(System.in);
 
     public Interpreter(Set<Command> commandSet) {
@@ -42,7 +57,11 @@ public class Interpreter {
             if (key.equals(cmd[0])) {
                 correctCmdName = true;
                 Command currentCmd = entry.getValue();
-                currentCmd.execute(cmd);
+                if (ARGS_NUM.get(currentCmd) != null) {
+                    currentCmd.execute(cmd, ARGS_NUM.get(currentCmd));
+                } else {
+                    currentCmd.execute(cmd, VAR_ARGS_NUM);
+                }
                 break;
             }
         }

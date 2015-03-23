@@ -22,21 +22,11 @@ public class ObjectTableProviderTest extends ObjectTableProvider {
         name = "TestTable";
         columnTypes.add(int.class);
         columnTypes.add(long.class);
-        columnTypes.add(double.class);
-        columnTypes.add(float.class);
-        columnTypes.add(byte.class);
-        columnTypes.add(boolean.class);
-        columnTypes.add(String.class);
         testTable = (ObjectTable) new ObjectTableProvider().createTable(name, columnTypes);
         deserializedValue.getSubValueList().add(100500);
         deserializedValue.getSubValueList().add((long) 10000000);
-        deserializedValue.getSubValueList().add(123.456);
-        deserializedValue.getSubValueList().add((float) 12.45);
-        deserializedValue.getSubValueList().add((byte) 100);
-        deserializedValue.getSubValueList().add(true);
-        deserializedValue.getSubValueList().add("\"ValueToTest\"");
         deserializedValue.setTypeKeeper(columnTypes);
-        deserializedValue.setSerialisedValue("[100500, 10000000, 123.456, 12.45, 100, true, \"ValueToTest\"]");
+        deserializedValue.setSerialisedValue("[100500, 10000000]");
     }
 
     @Test
@@ -72,7 +62,7 @@ public class ObjectTableProviderTest extends ObjectTableProvider {
     }
 
     @Test
-    public void createForFirstTest() {
+    public void createForTest() {
         assertEquals(deserializedValue, createFor(testTable, deserializedValue.getSubValueList()));
     }
 

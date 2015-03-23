@@ -1,11 +1,6 @@
 package ru.fizteh.fivt.students.MaximGotovchits.Parallel.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.*;
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.base.commands.Use;
 import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectStoreable;
 import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTable;
 import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTableProvider;
@@ -13,6 +8,8 @@ import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTableProvi
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 public class ObjectTableTest {
     private String name;
@@ -39,79 +36,69 @@ public class ObjectTableTest {
 
     @Test
     public void putTest() throws Exception {
-        new Use().useFunction(name, null);
         assertNull(testTable.put("Key", deserializedValue));
         assertEquals(deserializedValue, testTable.put("Key", deserializedValue));
     }
 
     @Test
     public void getTest() throws Exception {
-        new Use().useFunction(name, null);
         testTable.put("Key", deserializedValue);
         assertEquals(deserializedValue, testTable.get("Key"));
     }
 
     @Test
     public void sizeTest() throws Exception {
-        new Use().useFunction(name, null);
-        for (Integer i = 0; i < 3; ++i) {
-            testTable.put(i.toString(), deserializedValue);
-        }
-        assertEquals(3, testTable.size());
+        testTable.put("1", deserializedValue);
+        testTable.put("2", deserializedValue);
+        assertEquals(2, testTable.size());
     }
 
     @Test
     public void listTest() throws Exception {
-        new Use().useFunction(name, null);
         List<String> toCompare = new LinkedList<String>();
-        for (Integer i = 0; i < 3; ++i) {
-            toCompare.add(i.toString());
-            testTable.put(i.toString(), deserializedValue);
-        }
+        toCompare.add("23");
+        testTable.put("23", deserializedValue);
         assertTrue(toCompare.containsAll(testTable.list()));
     }
 
     @Test
     public void removeTest() throws Exception {
-        new Use().useFunction(name, null);
         testTable.put("Key", deserializedValue);
         assertEquals(deserializedValue, testTable.remove("Key"));
     }
 
     @Test
     public void commitTest() {
-        for (Integer i = 0; i < 3; ++i) {
-            testTable.put(i.toString(), deserializedValue);
-        }
+        testTable.put("0", deserializedValue);
+        testTable.put("1", deserializedValue);
         assertEquals(deserializedValue, testTable.get("0"));
         assertEquals(deserializedValue, testTable.get("1"));
-        assertEquals(deserializedValue, testTable.get("2"));
-        assertEquals(3, testTable.commit());
+        assertEquals(2, testTable.commit());
         assertEquals(deserializedValue, testTable.get("0"));
         assertEquals(deserializedValue, testTable.get("1"));
-        assertEquals(deserializedValue, testTable.get("2"));
     }
 
     @Test
     public void rollbackTest() {
-        for (Integer i = 0; i < 3; ++i) {
-            testTable.put(i.toString(), deserializedValue);
-        }
+        testTable.put("0", deserializedValue);
+        testTable.put("1", deserializedValue);
         assertEquals(deserializedValue, testTable.get("0"));
         assertEquals(deserializedValue, testTable.get("1"));
-        assertEquals(deserializedValue, testTable.get("2"));
-        assertEquals(3, testTable.rollback());
+        assertEquals(2, testTable.rollback());
         assertNull(testTable.get("0"));
         assertNull(testTable.get("1"));
-        assertNull(testTable.get("2"));
+        testTable.put("0", deserializedValue);
+        testTable.commit();
+        testTable.put("1", deserializedValue);
+        testTable.rollback();
+        assertNull(testTable.get("1"));
+        assertNotNull("0");
     }
 
     @Test
     public void getNumberOfUncommittedChangesTest() {
-        for (Integer i = 0; i < 2; ++i) {
-            String key = i.toString();
-            testTable.put(key, deserializedValue);
-        }
+        testTable.put("1", deserializedValue);
+        testTable.put("2", deserializedValue);
         assertEquals(2, testTable.getNumberOfUncommittedChanges());
         testTable.commit();
         assertEquals(0, testTable.getNumberOfUncommittedChanges());
@@ -124,7 +111,6 @@ public class ObjectTableTest {
 
     @Test
     public void getColumnType() throws Exception {
-        new Use().useFunction(name, null);
         assertEquals(int.class, testTable.getColumnType(0));
         assertEquals(long.class, testTable.getColumnType(1));
         }

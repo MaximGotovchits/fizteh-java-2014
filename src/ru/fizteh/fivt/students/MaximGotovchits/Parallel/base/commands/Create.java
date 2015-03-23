@@ -1,8 +1,8 @@
 package ru.fizteh.fivt.students.MaximGotovchits.Parallel.base.commands;
 
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.interpreter.Command;
 import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTable;
 import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTableProvider;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.interpreter.Command;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -20,7 +20,7 @@ public class Create extends Command {
     }
 
     @Override
-    public boolean execute(String[] cmd) {
+    public boolean execute(String[] cmd, int args) {
         if (CommandTools.amountOfArgumentsIsMoreThan(2, cmd)) {
             String createParameter; // (...) - type list.
             String tableName = cmd[1];

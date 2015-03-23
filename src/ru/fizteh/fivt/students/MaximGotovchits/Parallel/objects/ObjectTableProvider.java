@@ -17,7 +17,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ObjectTableProvider implements TableProvider {
-    private static Set<Class<?>> allowedTypes;
     private static final Charset UTF = StandardCharsets.UTF_8;
     private static final int DIR_NUM = 16;
     private static final int FILE_NUM = 16;
@@ -34,24 +33,29 @@ public class ObjectTableProvider implements TableProvider {
     private static String dataBaseName = System.getProperty("fizteh.db.dir");
     private volatile boolean writeSectionIsInUse = false;
     private String rootDirectory = "";
-    private void fillAllowedTypes() {
-        allowedTypes.add(Integer.class);
-        allowedTypes.add(Long.class);
-        allowedTypes.add(Boolean.class);
-        allowedTypes.add(String.class);
-        allowedTypes.add(Byte.class);
-        allowedTypes.add(Double.class);
-        allowedTypes.add(Float.class);
+    public static final Map<Class<?>, Class<?>> ALLOWED_TYPES = new HashMap<Class<?>, Class<?>>();
+    static {
+        ALLOWED_TYPES.put(int.class, int.class);
+        ALLOWED_TYPES.put(long.class, long.class);
+        ALLOWED_TYPES.put(byte.class, byte.class);
+        ALLOWED_TYPES.put(float.class, float.class);
+        ALLOWED_TYPES.put(double.class, double.class);
+        ALLOWED_TYPES.put(boolean.class, boolean.class);
+        ALLOWED_TYPES.put(String.class, String.class);
+        ALLOWED_TYPES.put(Integer.class, int.class);
+        ALLOWED_TYPES.put(Long.class, long.class);
+        ALLOWED_TYPES.put(Byte.class, byte.class);
+        ALLOWED_TYPES.put(Float.class, float.class);
+        ALLOWED_TYPES.put(Double.class, double.class);
+        ALLOWED_TYPES.put(Boolean.class, boolean.class);
     }
 
     public ObjectTableProvider() {
-        fillAllowedTypes();
         rootDirectory = dataBaseName;
     }
 
 
     public ObjectTableProvider(String dir) {
-        fillAllowedTypes();
         dataBaseName = dir;
         rootDirectory = dir;
     }
@@ -62,10 +66,6 @@ public class ObjectTableProvider implements TableProvider {
 
     public String getDataBaseName() {
         return dataBaseName;
-    }
-
-    public ObjectTable getUsingTable() {
-        return currentTableObject;
     }
 
     public String getUsingTableName() {
@@ -226,11 +226,11 @@ public class ObjectTableProvider implements TableProvider {
     }
 
     public int getChangesNumber() {
-        return getUsingTable().getStorage().get().size() - getUsingTable().getCommitStorage().size();
+        return currentTableObject.getStorage().get().size() - currentTableObject.getCommitStorage().size();
     }
 
     public int getStorageSize() {
-        return getUsingTable().getStorage().get().size();
+        return currentTableObject.getStorage().get().size();
     }
 
     public boolean changeUsingTable(String tableName, String oldTableName) throws IOException, ParseException {
@@ -311,14 +311,29 @@ public class ObjectTableProvider implements TableProvider {
     }
 
     private Object getValue(String str, Class<?> expectedType) throws NumberFormatException {
-        if (allowedTypes.contains(expectedType)) {
-            if (isNull(str)) {
+        if (expectedType.equals(int.class)) { // Тут нельзя заменять на обращение к мапу.c
+            if (str.equals("null")) {
                 return null;
             }
-            return expectedType;
+            Integer toReturn = Integer.parseInt(str);
+            return toReturn;
+        }
+        if (expectedType.equals(long.class)) {
+            if (str.equals("null")) {
+                return null;
+            }
+            Long toReturn = Long.parseLong(str);
+            return toReturn;
+        }
+        if (expectedType.equals(boolean.class)) {
+            if (str.equals("null")) {
+                return null;
+            }
+            Boolean toReturn = Boolean.parseBoolean(str);
+            return toReturn;
         }
         if (expectedType.equals(String.class)) {
-            if (isNull(str)) {
+            if (str.equals("null")) {
                 return null;
             }
             String[] tmp = str.split("");
@@ -328,8 +343,32 @@ public class ObjectTableProvider implements TableProvider {
                 throw new NumberFormatException();
             }
         }
-        return INCORRECT_SYMBOL;
+        if (expectedType.equals(byte.class)) {
+            if (str.equals("null")) {
+                return null;
+            }
+            Byte toReturn = Byte.parseByte(str);
+            return toReturn;
+        }
+        if (expectedType.equals(double.class)) {
+            if (str.equals("null")) {
+                return null;
+            }
+            Double toReturn = Double.parseDouble(str);
+            return toReturn;
+        }
+        if (expectedType.equals(float.class)) {
+            if (str.equals("null")) {
+                return null;
+            }
+            Float toReturn = Float.parseFloat(str);
+            return toReturn;
+        }
+        return "^incorrect@";
     }
+
+
+
 
     boolean isNull(String str) {
         if (str.equals("null")) {
@@ -360,10 +399,8 @@ public class ObjectTableProvider implements TableProvider {
     private List<Class<?>> convertToPrimitive(List<?> list) {
         List<Class<?>> toReturn = new LinkedList<>();
         for (Object object : list) {
-            if (allowedTypes.contains(object.getClass())) {
-                toReturn.add(object.getClass());
-                continue;
-            }
+            toReturn.add(ALLOWED_TYPES.get(object.getClass()));
+            continue;
         }
         return toReturn;
     }

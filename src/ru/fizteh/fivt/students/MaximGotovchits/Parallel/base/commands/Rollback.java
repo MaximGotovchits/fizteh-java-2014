@@ -1,17 +1,10 @@
 package ru.fizteh.fivt.students.MaximGotovchits.Parallel.base.commands;
 
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.interpreter.Command;
-
-public class Rollback extends Command {
+public class Rollback extends CommandWithCheckedNumArgs {
     @Override
-    public boolean execute(String[] cmd) {
-        if (CommandTools.amountOfArgumentsIs(1, cmd)) {
-            CommandTools.currentTableProvider.getUsingTable().rollback();
-            return true;
-        }
-        return false;
+    void executeWithCompleteArgs(String[] cmd) {
+        CommandTools.getUsingTable().rollback();
     }
-
     @Override
     public String getCmdName() {
         return "rollback";

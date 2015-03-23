@@ -1,13 +1,13 @@
 package ru.fizteh.fivt.students.MaximGotovchits.Parallel.base.commands;
 
-import ru.fizteh.fivt.students.MaximGotovchits.Parallel.interpreter.Command;
 import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectStoreable;
 import ru.fizteh.fivt.students.MaximGotovchits.Parallel.objects.ObjectTableProvider;
+import ru.fizteh.fivt.students.MaximGotovchits.Parallel.interpreter.Command;
 
 import java.util.Arrays;
 
 public class Put extends Command {
-    public boolean execute(String[] cmd) {
+    public boolean execute(String[] cmd, int args) {
         if (CommandTools.amountOfArgumentsIsMoreThan(2, cmd)) {
             if (CommandTools.tableIsChosen) {
                 String putParameter;
@@ -15,8 +15,8 @@ public class Put extends Command {
                 putParameter = String.join(" " , Arrays.copyOfRange(cmd, 2, cmd.length));
                 try {
                     ObjectStoreable value = (ObjectStoreable) new ObjectTableProvider().
-                            deserialize(CommandTools.currentTableProvider.getUsingTable(), putParameter);
-                    ObjectStoreable temp = (ObjectStoreable) CommandTools.currentTableProvider.getUsingTable()
+                            deserialize(CommandTools.getUsingTable(), putParameter);
+                    ObjectStoreable temp = (ObjectStoreable) CommandTools.getUsingTable()
                             .put(key, value);
                     if (temp == null) {
                         System.out.println("new");
