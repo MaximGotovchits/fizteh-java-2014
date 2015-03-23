@@ -49,109 +49,109 @@ public class BatchModeTest {
     @Test
     public void useTest() {
         String[] cmd = {"use", TEST_TABLE_NAME};
-        assertTrue(new Use().execute(cmd));
+        assertTrue(new Use().execute(cmd, 0));
     }
 
     @Test
     public void useErrTest() {
         String[] cmd = {"bugaga"};
-        assertFalse(new Use().execute(cmd));
+        assertFalse(new Use().execute(cmd, 0));
     }
 
     @Test
     public void showTablesTest() {
         String[] cmd = {"show", "tables"};
-        assertTrue(new ShowTables().execute(cmd));
+        assertTrue(new ShowTables().execute(cmd, 0));
     }
 
     @Test
     public void showTablesErrTest() {
         String[] cmd = {"bugaga"};
-        assertFalse(new ShowTables().execute(cmd));
+        assertFalse(new ShowTables().execute(cmd, 0));
     }
 
     @Test
     public void rollbackTest() {
         String[] cmd = {"rollback"};
-        assertTrue(new Rollback().execute(cmd));
+        assertTrue(new Rollback().execute(cmd, 0));
     }
 
     @Test
     public void rollbackErrTest() {
         String[] cmd = {"bugaga", "fail"};
-        assertFalse(new Rollback().execute(cmd));
+        assertFalse(new Rollback().execute(cmd, 0));
     }
 
     @Test
     public void removeTest() {
         String[] cmd = {"remove", "not_existing_table"};
-        assertTrue(new Remove().execute(cmd));
+        assertTrue(new Remove().execute(cmd, 0));
     }
 
     @Test
     public void removeErrTest() {
         String[] cmd = {"bugaga"};
-        assertFalse(new Remove().execute(cmd));
+        assertFalse(new Remove().execute(cmd, 0));
     }
 
     @Test
     public void putTest() {
         String[] cmd = {"put", "K", "[100]"};
-        assertTrue(new Put().execute(cmd));
+        assertTrue(new Put().execute(cmd, 0));
     }
 
     @Test
     public void putErrTest() {
         String[] cmd = {"bugaga"};
-        assertFalse(new Put().execute(cmd));
+        assertFalse(new Put().execute(cmd, 0));
     }
 
     @Test
     public void listTest() {
         String[] cmd = {"list"};
-        assertTrue(new List().execute(cmd));
+        assertTrue(new List().execute(cmd, 0));
     }
 
     @Test
     public void listErrTest() {
         String[] cmd = {"bugaga", "fail"};
-        assertFalse(new List().execute(cmd));
+        assertFalse(new List().execute(cmd, 0));
     }
 
     @Test
     public void dropTest() {
         String[] cmd = {"drop", "something"};
-        assertTrue(new Drop().execute(cmd));
+        assertTrue(new Drop().execute(cmd, 0));
     }
 
     @Test
     public void dropErrTest() {
         String[] cmd = {"bugaga"};
-        assertFalse(new Drop().execute(cmd));
+        assertFalse(new Drop().execute(cmd, 0));
     }
 
     @Test
     public void createTest() {
         String[] cmd = {"create", "something", "(int)"};
-        assertTrue(new Create().execute(cmd));
+        assertTrue(new Create().execute(cmd, 0));
     }
 
     @Test
     public void createErrTest() {
         String[] cmd = {"bugaga"};
-        assertFalse(new Create().execute(cmd));
+        assertFalse(new Create().execute(cmd, 0));
     }
 
     @Test
     public void commitTest() {
         String[] cmd = {"commit"};
-        assertTrue(new Commit().execute(cmd));
+        assertTrue(new Commit().execute(cmd, 0));
     }
 
     @Test
     public void commitErrTest() {
         String[] cmd = {"bugaga", "fail"};
-        assertFalse(new Commit().execute(cmd));
+        assertFalse(new Commit().execute(cmd, 0));
     }
 
     @After
